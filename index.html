@@ -25,13 +25,17 @@
       <div id="tab-patients" class="tab-content">
         <div class="flex justify-between items-center mb-4">
           <h2 class="font-bold text-xl text-blue-900">Danh Sách Bệnh Nhân</h2>
-          <div class="space-x-1">
-            <button onclick="PatientManager.exportJSON()" class="bg-green-600 text-white text-xs px-2.5 py-1.5 rounded font-medium">Xuất JSON</button>
-            <label class="bg-indigo-600 text-white text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer">
+          <div class="space-x-1 flex items-center">
+            <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-amber-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-amber-700 transition">📅 Tái khám hôm nay</button>
+            <button onclick="PatientManager.exportJSON()" class="bg-green-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-green-700 transition">Xuất JSON</button>
+            <label class="bg-indigo-600 text-white text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-indigo-700 transition">
               Nhập JSON <input type="file" accept=".json" onchange="PatientManager.importJSON(event)" class="hidden">
             </label>
           </div>
         </div>
+
+        <!-- Khung chứa danh sách tái khám hôm nay (hiển thị khi nhấn nút) -->
+        <div id="today-patient-container" class="hidden mb-4"></div>
 
         <!-- Search Bar -->
         <div class="mb-3">
