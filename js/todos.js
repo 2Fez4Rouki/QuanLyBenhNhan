@@ -1,3 +1,5 @@
+import { Storage } from './storage.js';
+
 const TodoManager = {
   init() {
     this.render();
@@ -123,3 +125,5 @@ const TodoManager = {
     this.render();
   }
 };
+
+window.TodoManager = TodoManager;
