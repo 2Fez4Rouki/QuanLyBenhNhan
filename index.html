@@ -33,6 +33,11 @@
           </div>
         </div>
 
+        <!-- Search Bar -->
+        <div class="mb-3">
+          <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border p-2 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
+        </div>
+
         <!-- Add Patient Form -->
         <form onsubmit="PatientManager.addPatient(event)" class="bg-gray-50 p-3 rounded-xl border mb-4 space-y-2">
           <input type="text" id="p-name" placeholder="Họ tên bệnh nhân" required class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
@@ -44,7 +49,7 @@
             <label class="text-xs text-gray-500 font-medium">Ngày tái khám:</label>
             <input type="date" id="p-next-date" class="flex-1 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
           </div>
-          <textarea id="p-note" placeholder="Ghi chú chẩn đoán/bệnh lý..." class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500"></textarea>
+          <textarea id="p-note" placeholder="Ghi chú tổng quan bệnh lý..." class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500"></textarea>
           <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-medium text-sm hover:bg-blue-700">Thêm Bệnh Nhân</button>
         </form>
 

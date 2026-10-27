@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meditask-v1';
+const CACHE_NAME = 'meditask-v2';
 const assets = [
   './index.html',
   './css/style.css',
