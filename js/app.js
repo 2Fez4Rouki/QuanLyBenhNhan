@@ -1,6 +1,6 @@
 import { Storage } from './storage.js';
 
-// Định nghĩa hàm chuyển tab và gắn trực tiếp vào window để HTML onclick gọi được
+// Hàm chuyển tab toàn cục
 window.switchTab = function(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -18,14 +18,14 @@ window.switchTab = function(tabId) {
   }
 };
 
-// Khởi tạo các Manager khi trang đã tải xong
+// Đảm bảo khi DOM tải xong thì khởi tạo ứng dụng
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("🚀 Ứng dụng đã sẵn sàng, đang khởi tạo các module...");
+  console.log("🚀 Ứng dụng đã khởi động thành công!");
   
-  if (typeof PatientManager !== 'undefined') {
-    PatientManager.init();
+  if (window.PatientManager && typeof window.PatientManager.init === 'function') {
+    window.PatientManager.init();
   }
-  if (typeof TodoManager !== 'undefined') {
-    TodoManager.init();
+  if (window.TodoManager && typeof window.TodoManager.init === 'function') {
+    window.TodoManager.init();
   }
 });
