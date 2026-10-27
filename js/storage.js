@@ -1,4 +1,3 @@
-// Import Firebase SDK từ CDN chính thức
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -11,15 +10,13 @@ const firebaseConfig = {
   appId: "1:913701784617:web:e5ca081d48d345268da038"
 };
 
-console.log("Đang khởi tạo kết nối Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const CLOUD_DOC_REF = doc(db, "meditask", "main_data");
 
-const Storage = {
+export const Storage = {
   async syncFromCloud() {
     try {
-      console.log("Đang tải dữ liệu từ Firebase Cloud...");
       const docSnap = await getDoc(CLOUD_DOC_REF);
       if (docSnap.exists()) {
         const cloudData = docSnap.data();
@@ -32,11 +29,9 @@ const Storage = {
         console.log("✅ Đã đồng bộ dữ liệu từ Firebase Cloud thành công!");
         if (typeof PatientManager !== 'undefined') PatientManager.init();
         if (typeof TodoManager !== 'undefined') TodoManager.init();
-      } else {
-        console.log("ℹ️ Cloud chưa có dữ liệu, đang dùng dữ liệu local hiện tại.");
       }
     } catch (err) {
-      console.error("❌ Lỗi kết nối Cloud (syncFromCloud):", err.code, err.message);
+      console.error("❌ Lỗi kết nối Cloud:", err);
     }
   },
 
@@ -47,7 +42,7 @@ const Storage = {
       await setDoc(CLOUD_DOC_REF, { patients, todos });
       console.log("☁️ Đã đẩy dữ liệu lên Firebase Cloud thành công!");
     } catch (err) {
-      console.error("❌ Lỗi đẩy dữ liệu lên Cloud (syncToCloud):", err.code, err.message);
+      console.error("❌ Lỗi đẩy dữ liệu lên Cloud:", err);
     }
   },
 
@@ -72,8 +67,5 @@ const Storage = {
   }
 };
 
-// Gắn ra window để các file khác gọi được
 window.Storage = Storage;
-
-// Tự động kéo dữ liệu khi khởi động
 Storage.syncFromCloud();
