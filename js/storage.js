@@ -2,9 +2,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// ==========================================
-// THAY THẾ ĐOẠN CẤU HÌNH NÀY BẰNG CỦA BẠN (TỪ BƯỚC 1)
-// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDIrXhvz31PzAtJrK2WnZJMirbU09ahMWo",
   authDomain: "medicaltask-b4d8c.firebaseapp.com",
@@ -14,16 +11,15 @@ const firebaseConfig = {
   appId: "1:913701784617:web:e5ca081d48d345268da038"
 };
 
-// Khởi tạo Firebase & Firestore
+console.log("Đang khởi tạo kết nối Firebase...");
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const CLOUD_DOC_REF = doc(db, "meditask", "main_data");
 
 const Storage = {
-  // Đồng bộ dữ liệu từ Cloud về máy khi khởi động app
   async syncFromCloud() {
     try {
+      console.log("Đang tải dữ liệu từ Firebase Cloud...");
       const docSnap = await getDoc(CLOUD_DOC_REF);
       if (docSnap.exists()) {
         const cloudData = docSnap.data();
@@ -33,25 +29,25 @@ const Storage = {
         if (cloudData.todos) {
           localStorage.setItem('todos_db', JSON.stringify(cloudData.todos));
         }
-        console.log("Đã đồng bộ dữ liệu từ Firebase Cloud thành công!");
-        // Gọi lại render nếu các đối tượng quản lý đã sẵn sàng
+        console.log("✅ Đã đồng bộ dữ liệu từ Firebase Cloud thành công!");
         if (typeof PatientManager !== 'undefined') PatientManager.init();
         if (typeof TodoManager !== 'undefined') TodoManager.init();
+      } else {
+        console.log("ℹ️ Cloud chưa có dữ liệu, đang dùng dữ liệu local hiện tại.");
       }
     } catch (err) {
-      console.log("Không thể kết nối Cloud, đang dùng dữ liệu offline trên máy:", err);
+      console.error("❌ Lỗi kết nối Cloud (syncFromCloud):", err.code, err.message);
     }
   },
 
-  // Đẩy dữ liệu từ máy lên Cloud ngầm
   async syncToCloud() {
     try {
       const patients = JSON.parse(localStorage.getItem('patients_db') || '[]');
       const todos = JSON.parse(localStorage.getItem('todos_db') || '[]');
       await setDoc(CLOUD_DOC_REF, { patients, todos });
-      console.log("Đã lưu dữ liệu lên Firebase Cloud!");
+      console.log("☁️ Đã đẩy dữ liệu lên Firebase Cloud thành công!");
     } catch (err) {
-      console.error("Lỗi đồng bộ lên Cloud:", err);
+      console.error("❌ Lỗi đẩy dữ liệu lên Cloud (syncToCloud):", err.code, err.message);
     }
   },
 
@@ -62,7 +58,7 @@ const Storage = {
 
   savePatients(patients) {
     localStorage.setItem('patients_db', JSON.stringify(patients));
-    this.syncToCloud(); // Tự động đẩy lên mây khi thay đổi
+    this.syncToCloud();
   },
 
   getTodos() {
@@ -72,12 +68,12 @@ const Storage = {
 
   saveTodos(todos) {
     localStorage.setItem('todos_db', JSON.stringify(todos));
-    this.syncToCloud(); // Tự động đẩy lên mây khi thay đổi
+    this.syncToCloud();
   }
 };
 
-// Gắn Storage ra biến toàn cục để các file JS khác gọi bình thường
+// Gắn ra window để các file khác gọi được
 window.Storage = Storage;
 
-// Tự động kéo dữ liệu mới nhất từ Cloud ngay khi mở app
+// Tự động kéo dữ liệu khi khởi động
 Storage.syncFromCloud();
