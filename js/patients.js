@@ -1,5 +1,6 @@
 const PatientManager = {
   searchKeyword: '',
+  editingId: null,
 
   init() {
     this.render();
@@ -12,19 +13,13 @@ const PatientManager = {
     if (!container) return;
 
     const keyword = this.searchKeyword.toLowerCase().trim();
-
-    // Khi chưa nhập từ khóa tìm kiếm -> Không hiển thị danh sách để làm gọn giao diện
+    
+    // Nếu chưa nhập từ khóa, không hiển thị danh sách
     if (!keyword) {
-      container.innerHTML = `
-        <div class="text-center py-8 text-gray-400">
-          <p class="text-2xl mb-1">🔍</p>
-          <p class="text-sm">Nhập tên, SĐT hoặc ngày tái khám để tìm bệnh nhân</p>
-        </div>
-      `;
+      container.innerHTML = `<p class="text-gray-400 text-center py-4 text-xs italic">Nhập từ khóa vào ô tìm kiếm ở trên để hiển thị bệnh nhân.</p>`;
       return;
     }
 
-    // Lọc bệnh nhân theo từ khóa
     const filtered = patients.filter(p => {
       return (
         (p.name && p.name.toLowerCase().includes(keyword)) ||
@@ -35,11 +30,34 @@ const PatientManager = {
     });
 
     if (filtered.length === 0) {
-      container.innerHTML = `<p class="text-gray-500 text-center py-4">Không tìm thấy bệnh nhân nào phù hợp với "${this.searchKeyword}".</p>`;
+      container.innerHTML = `<p class="text-gray-500 text-center py-4">Không tìm thấy bệnh nhân nào phù hợp.</p>`;
       return;
     }
 
     container.innerHTML = filtered.map(p => {
+      // Nếu bệnh nhân đang ở chế độ chỉnh sửa
+      if (p.id === this.editingId) {
+        return `
+          <div class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 mb-3 space-y-2">
+            <div class="font-bold text-sm text-blue-900 mb-1">Chỉnh sửa thông tin bệnh nhân</div>
+            <input type="text" id="edit-name-${p.id}" value="${p.name || ''}" placeholder="Họ tên" class="w-full text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+            <div class="flex space-x-2">
+              <input type="date" id="edit-dob-${p.id}" value="${p.dob || ''}" class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+              <input type="tel" id="edit-phone-${p.id}" value="${p.phone || ''}" placeholder="SĐT" class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="flex items-center space-x-2">
+              <label class="text-xs text-gray-600 font-medium">Tái khám:</label>
+              <input type="date" id="edit-next-${p.id}" value="${p.nextDate || ''}" class="flex-1 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+            </div>
+            <textarea id="edit-note-${p.id}" placeholder="Ghi chú chung..." class="w-full text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">${p.note || ''}</textarea>
+            <div class="flex space-x-2 pt-1">
+              <button onclick="PatientManager.saveEdit('${p.id}')" class="flex-1 bg-blue-600 text-white text-xs py-2 rounded font-medium hover:bg-blue-700">Lưu thay đổi</button>
+              <button onclick="PatientManager.cancelEdit()" class="bg-gray-300 text-gray-700 text-xs px-3 py-2 rounded font-medium hover:bg-gray-400">Hủy</button>
+            </div>
+          </div>
+        `;
+      }
+
       const historyList = (p.history || []).map(h => `
         <div class="flex justify-between items-center text-xs bg-white p-2 rounded border border-gray-100 mb-1">
           <div>
@@ -57,7 +75,10 @@ const PatientManager = {
               <p class="text-sm text-gray-600">📞 ${p.phone} | 📅 NS: ${p.dob}</p>
               <p class="text-sm text-amber-600 font-medium mt-1">🔄 Tái khám: ${p.nextDate || 'Chưa có lịch'}</p>
             </div>
-            <button onclick="PatientManager.deletePatient('${p.id}')" class="text-red-500 hover:text-red-700 text-sm font-semibold">Xóa</button>
+            <div class="flex space-x-2 items-center">
+              <button onclick="PatientManager.startEdit('${p.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">Sửa</button>
+              <button onclick="PatientManager.deletePatient('${p.id}')" class="text-red-500 hover:text-red-700 text-sm font-semibold">Xóa</button>
+            </div>
           </div>
           <div class="mt-2 text-sm bg-gray-50 p-2 rounded text-gray-700">
             <strong>Ghi chú chung:</strong> ${p.note || 'Không có'}
@@ -92,6 +113,49 @@ const PatientManager = {
     this.render();
   },
 
+  startEdit(id) {
+    this.editingId = id;
+    this.render();
+  },
+
+  cancelEdit() {
+    this.editingId = null;
+    this.render();
+  },
+
+  saveEdit(id) {
+    const name = document.getElementById(`edit-name-${id}`).value;
+    const dob = document.getElementById(`edit-dob-${id}`).value;
+    const phone = document.getElementById(`edit-phone-${id}`).value;
+    const nextDate = document.getElementById(`edit-next-${id}`).value;
+    const note = document.getElementById(`edit-note-${id}`).value;
+
+    if (!name || !dob || !phone) {
+      alert('Vui lòng điền đầy đủ các thông tin bắt buộc (Tên, Ngày sinh, SĐT)!');
+      return;
+    }
+
+    let patients = Storage.getPatients();
+    patients = patients.map(p => {
+      if (p.id === id) {
+        return {
+          ...p,
+          name,
+          dob,
+          phone,
+          nextDate,
+          note
+        };
+      }
+      return p;
+    });
+
+    Storage.savePatients(patients);
+    this.editingId = null;
+    this.render();
+    this.checkReminders();
+  },
+
   addPatient(e) {
     e.preventDefault();
     const patients = Storage.getPatients();
@@ -106,12 +170,6 @@ const PatientManager = {
     };
     patients.push(newPatient);
     Storage.savePatients(patients);
-    
-    // Tự động điền tên vừa thêm vào ô tìm kiếm để hiển thị ngay bệnh nhân đó
-    this.searchKeyword = newPatient.name;
-    const searchInput = document.getElementById('p-search');
-    if (searchInput) searchInput.value = newPatient.name;
-
     this.render();
     this.checkReminders();
     e.target.reset();
@@ -153,7 +211,7 @@ const PatientManager = {
   },
 
   deleteHistory(patientId, historyId) {
-    if (!confirm('Bạn có muốn xóa mục lịch sử khám này không?')) return;
+    if (!confirm('Bạn có chắc muốn xóa mục lịch sử khám này?')) return;
     let patients = Storage.getPatients();
     patients = patients.map(p => {
       if (p.id === patientId) {
