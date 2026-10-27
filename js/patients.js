@@ -1,7 +1,8 @@
 const PatientManager = {
   searchKeyword: '',
   editingId: null,
-  showTodayOnly: false, // Trạng thái hiển thị danh sách tái khám hôm nay
+  showTodayOnly: false,
+  showAllPatients: false, // Trạng thái hiển thị toàn bộ danh sách
 
   init() {
     this.render();
@@ -13,16 +14,19 @@ const PatientManager = {
     const container = document.getElementById('patient-list');
     const todayContainer = document.getElementById('today-patient-container');
     const todayToggleBtn = document.getElementById('btn-today-toggle');
+    const allToggleBtn = document.getElementById('btn-all-toggle');
     if (!container) return;
 
     const today = new Date().toISOString().split('T')[0];
     const todayList = patients.filter(p => p.nextDate === today);
 
-    // 1. Render khu vực danh sách tái khám hôm nay (nếu bấm nút)
+    // 1. Render khu vực tái khám hôm nay
     if (todayContainer) {
       if (this.showTodayOnly) {
-        todayToggleBtn.classList.remove('bg-amber-600');
-        todayToggleBtn.classList.add('bg-amber-800', 'ring-2', 'ring-amber-300');
+        if (todayToggleBtn) {
+          todayToggleBtn.classList.remove('bg-amber-600');
+          todayToggleBtn.classList.add('bg-amber-800', 'ring-2', 'ring-amber-300');
+        }
         
         if (todayList.length === 0) {
           todayContainer.innerHTML = `<div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800 text-center">Hôm nay (${today}) không có bệnh nhân nào lịch tái khám.</div>`;
@@ -30,7 +34,7 @@ const PatientManager = {
           todayContainer.innerHTML = `
             <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl shadow-sm space-y-2">
               <div class="font-bold text-xs text-amber-900 uppercase flex justify-between items-center">
-                <span>🔔 Danh sách tái khám hôm nay (${todayList.length}):</span>
+                <span>🔔 Tái khám hôm nay (${todayList.length}):</span>
                 <span onclick="PatientManager.toggleTodayList()" class="cursor-pointer text-gray-500 hover:text-red-500 text-sm">✕ Đóng</span>
               </div>
               <div class="space-y-2">
@@ -38,7 +42,6 @@ const PatientManager = {
                   <div class="bg-white p-2.5 rounded-lg border border-amber-100 flex justify-between items-center text-xs">
                     <div>
                       <span class="font-bold text-blue-900">${p.name}</span> - 📞 ${p.phone}
-                      <div class="text-gray-500 mt-0.5">Ghi chú: ${p.note || 'Không có'}</div>
                     </div>
                     <button onclick="PatientManager.searchAndFocus('${p.phone}')" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Xem/Sửa</button>
                   </div>
@@ -49,35 +52,51 @@ const PatientManager = {
         }
         todayContainer.classList.remove('hidden');
       } else {
-        todayToggleBtn.classList.remove('bg-amber-800', 'ring-2', 'ring-amber-300');
-        todayToggleBtn.classList.add('bg-amber-600');
+        if (todayToggleBtn) {
+          todayToggleBtn.classList.remove('bg-amber-800', 'ring-2', 'ring-amber-300');
+          todayToggleBtn.classList.add('bg-amber-600');
+        }
         todayContainer.classList.add('hidden');
       }
     }
 
-    // 2. Render danh sách tìm kiếm chính
+    // 2. Cập nhật giao diện nút DS Bệnh Nhân
+    if (allToggleBtn) {
+      if (this.showAllPatients) {
+        allToggleBtn.classList.remove('bg-blue-600');
+        allToggleBtn.classList.add('bg-blue-800', 'ring-2', 'ring-blue-300');
+      } else {
+        allToggleBtn.classList.remove('bg-blue-800', 'ring-2', 'ring-blue-300');
+        allToggleBtn.classList.add('bg-blue-600');
+      }
+    }
+
+    // 3. Render danh sách chính dựa trên từ khóa tìm kiếm hoặc trạng thái bật xem tất cả
     const keyword = this.searchKeyword.toLowerCase().trim();
     
-    if (!keyword) {
-      container.innerHTML = `<p class="text-gray-400 text-center py-4 text-xs italic">Nhập từ khóa vào ô tìm kiếm ở trên để hiển thị bệnh nhân.</p>`;
+    let targetList = [];
+    if (keyword) {
+      targetList = patients.filter(p => {
+        return (
+          (p.name && p.name.toLowerCase().includes(keyword)) ||
+          (p.phone && p.phone.toLowerCase().includes(keyword)) ||
+          (p.nextDate && p.nextDate.includes(keyword)) ||
+          (p.dob && p.dob.includes(keyword))
+        );
+      });
+    } else if (this.showAllPatients) {
+      targetList = patients;
+    } else {
+      container.innerHTML = `<p class="text-gray-400 text-center py-4 text-xs italic">Nhập từ khóa tìm kiếm hoặc bấm nút "DS Bệnh Nhân" ở trên để hiển thị danh sách.</p>`;
       return;
     }
 
-    const filtered = patients.filter(p => {
-      return (
-        (p.name && p.name.toLowerCase().includes(keyword)) ||
-        (p.phone && p.phone.toLowerCase().includes(keyword)) ||
-        (p.nextDate && p.nextDate.includes(keyword)) ||
-        (p.dob && p.dob.includes(keyword))
-      );
-    });
-
-    if (filtered.length === 0) {
+    if (targetList.length === 0) {
       container.innerHTML = `<p class="text-gray-500 text-center py-4">Không tìm thấy bệnh nhân nào phù hợp.</p>`;
       return;
     }
 
-    container.innerHTML = filtered.map(p => {
+    container.innerHTML = targetList.map(p => {
       if (p.id === this.editingId) {
         return `
           <div class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 mb-3 space-y-2">
@@ -153,11 +172,17 @@ const PatientManager = {
     this.render();
   },
 
+  toggleAllPatientsList() {
+    this.showAllPatients = !this.showAllPatients;
+    this.render();
+  },
+
   searchAndFocus(keyword) {
     this.searchKeyword = keyword;
     const searchInput = document.getElementById('p-search');
     if (searchInput) searchInput.value = keyword;
-    this.showTodayOnly = false; // Tắt danh sách hôm nay đi để focus vào kết quả tìm kiếm
+    this.showTodayOnly = false;
+    this.showAllPatients = false;
     this.render();
   },
 
@@ -257,7 +282,7 @@ const PatientManager = {
   },
 
   deleteHistory(patientId, historyId) {
-    if (!confirm('Bạn có chắc muốn xóa mục lịch sử khám này?')) return;
+    if (!confirm('Vui lòng xác nhận xóa mục lịch sử khám này?')) return;
     let patients = Storage.getPatients();
     patients = patients.map(p => {
       if (p.id === patientId) {
