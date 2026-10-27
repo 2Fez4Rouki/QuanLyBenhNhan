@@ -11,10 +11,21 @@ const PatientManager = {
     const container = document.getElementById('patient-list');
     if (!container) return;
 
-    // Filter based on searchKeyword
     const keyword = this.searchKeyword.toLowerCase().trim();
+
+    // Khi chưa nhập từ khóa tìm kiếm -> Không hiển thị danh sách để làm gọn giao diện
+    if (!keyword) {
+      container.innerHTML = `
+        <div class="text-center py-8 text-gray-400">
+          <p class="text-2xl mb-1">🔍</p>
+          <p class="text-sm">Nhập tên, SĐT hoặc ngày tái khám để tìm bệnh nhân</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Lọc bệnh nhân theo từ khóa
     const filtered = patients.filter(p => {
-      if (!keyword) return true;
       return (
         (p.name && p.name.toLowerCase().includes(keyword)) ||
         (p.phone && p.phone.toLowerCase().includes(keyword)) ||
@@ -24,7 +35,7 @@ const PatientManager = {
     });
 
     if (filtered.length === 0) {
-      container.innerHTML = `<p class="text-gray-500 text-center py-4">Không tìm thấy bệnh nhân nào phù hợp.</p>`;
+      container.innerHTML = `<p class="text-gray-500 text-center py-4">Không tìm thấy bệnh nhân nào phù hợp với "${this.searchKeyword}".</p>`;
       return;
     }
 
@@ -95,6 +106,12 @@ const PatientManager = {
     };
     patients.push(newPatient);
     Storage.savePatients(patients);
+    
+    // Tự động điền tên vừa thêm vào ô tìm kiếm để hiển thị ngay bệnh nhân đó
+    this.searchKeyword = newPatient.name;
+    const searchInput = document.getElementById('p-search');
+    if (searchInput) searchInput.value = newPatient.name;
+
     this.render();
     this.checkReminders();
     e.target.reset();
