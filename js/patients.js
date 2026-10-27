@@ -1,3 +1,5 @@
+import { Storage } from './storage.js';
+
 const PatientManager = {
   searchKeyword: '',
   editingId: null,
@@ -340,3 +342,6 @@ const PatientManager = {
     reader.readAsText(file);
   }
 };
+
+// Gắn ra window để các thẻ HTML onclick gọi được
+window.PatientManager = PatientManager;
