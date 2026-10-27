@@ -1,6 +1,7 @@
 const PatientManager = {
   searchKeyword: '',
   editingId: null,
+  showTodayOnly: false, // Trạng thái hiển thị danh sách tái khám hôm nay
 
   init() {
     this.render();
@@ -10,11 +11,53 @@ const PatientManager = {
   render() {
     const patients = Storage.getPatients();
     const container = document.getElementById('patient-list');
+    const todayContainer = document.getElementById('today-patient-container');
+    const todayToggleBtn = document.getElementById('btn-today-toggle');
     if (!container) return;
 
+    const today = new Date().toISOString().split('T')[0];
+    const todayList = patients.filter(p => p.nextDate === today);
+
+    // 1. Render khu vực danh sách tái khám hôm nay (nếu bấm nút)
+    if (todayContainer) {
+      if (this.showTodayOnly) {
+        todayToggleBtn.classList.remove('bg-amber-600');
+        todayToggleBtn.classList.add('bg-amber-800', 'ring-2', 'ring-amber-300');
+        
+        if (todayList.length === 0) {
+          todayContainer.innerHTML = `<div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800 text-center">Hôm nay (${today}) không có bệnh nhân nào lịch tái khám.</div>`;
+        } else {
+          todayContainer.innerHTML = `
+            <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl shadow-sm space-y-2">
+              <div class="font-bold text-xs text-amber-900 uppercase flex justify-between items-center">
+                <span>🔔 Danh sách tái khám hôm nay (${todayList.length}):</span>
+                <span onclick="PatientManager.toggleTodayList()" class="cursor-pointer text-gray-500 hover:text-red-500 text-sm">✕ Đóng</span>
+              </div>
+              <div class="space-y-2">
+                ${todayList.map(p => `
+                  <div class="bg-white p-2.5 rounded-lg border border-amber-100 flex justify-between items-center text-xs">
+                    <div>
+                      <span class="font-bold text-blue-900">${p.name}</span> - 📞 ${p.phone}
+                      <div class="text-gray-500 mt-0.5">Ghi chú: ${p.note || 'Không có'}</div>
+                    </div>
+                    <button onclick="PatientManager.searchAndFocus('${p.phone}')" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Xem/Sửa</button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+        todayContainer.classList.remove('hidden');
+      } else {
+        todayToggleBtn.classList.remove('bg-amber-800', 'ring-2', 'ring-amber-300');
+        todayToggleBtn.classList.add('bg-amber-600');
+        todayContainer.classList.add('hidden');
+      }
+    }
+
+    // 2. Render danh sách tìm kiếm chính
     const keyword = this.searchKeyword.toLowerCase().trim();
     
-    // Nếu chưa nhập từ khóa, không hiển thị danh sách
     if (!keyword) {
       container.innerHTML = `<p class="text-gray-400 text-center py-4 text-xs italic">Nhập từ khóa vào ô tìm kiếm ở trên để hiển thị bệnh nhân.</p>`;
       return;
@@ -35,7 +78,6 @@ const PatientManager = {
     }
 
     container.innerHTML = filtered.map(p => {
-      // Nếu bệnh nhân đang ở chế độ chỉnh sửa
       if (p.id === this.editingId) {
         return `
           <div class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 mb-3 space-y-2">
@@ -84,7 +126,6 @@ const PatientManager = {
             <strong>Ghi chú chung:</strong> ${p.note || 'Không có'}
           </div>
 
-          <!-- History / Sub-elements section -->
           <div class="mt-3 border-t pt-2">
             <div class="flex justify-between items-center mb-1">
               <span class="text-xs font-bold text-gray-700 uppercase">Lịch sử khám (${(p.history || []).length}):</span>
@@ -93,7 +134,6 @@ const PatientManager = {
               ${historyList || '<p class="text-xs text-gray-400 italic">Chưa có lịch sử khám nào.</p>'}
             </div>
             
-            <!-- Add history form inline -->
             <div class="bg-blue-50 p-2 rounded-lg space-y-2 mt-2">
               <div class="text-xs font-semibold text-blue-800">Thêm đợt khám / tái khám mới:</div>
               <div class="flex space-x-1">
@@ -106,6 +146,19 @@ const PatientManager = {
         </div>
       `;
     }).join('');
+  },
+
+  toggleTodayList() {
+    this.showTodayOnly = !this.showTodayOnly;
+    this.render();
+  },
+
+  searchAndFocus(keyword) {
+    this.searchKeyword = keyword;
+    const searchInput = document.getElementById('p-search');
+    if (searchInput) searchInput.value = keyword;
+    this.showTodayOnly = false; // Tắt danh sách hôm nay đi để focus vào kết quả tìm kiếm
+    this.render();
   },
 
   handleSearch(e) {
@@ -138,14 +191,7 @@ const PatientManager = {
     let patients = Storage.getPatients();
     patients = patients.map(p => {
       if (p.id === id) {
-        return {
-          ...p,
-          name,
-          dob,
-          phone,
-          nextDate,
-          note
-        };
+        return { ...p, name, dob, phone, nextDate, note };
       }
       return p;
     });
