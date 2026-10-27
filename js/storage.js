@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIrXhvz31PzAtJrK2WnZJMirbU09ahMWo",
@@ -15,26 +15,7 @@ const db = getFirestore(app);
 const CLOUD_DOC_REF = doc(db, "meditask", "main_data");
 
 export const Storage = {
-  async syncFromCloud() {
-    try {
-      const docSnap = await getDoc(CLOUD_DOC_REF);
-      if (docSnap.exists()) {
-        const cloudData = docSnap.data();
-        if (cloudData.patients) {
-          localStorage.setItem('patients_db', JSON.stringify(cloudData.patients));
-        }
-        if (cloudData.todos) {
-          localStorage.setItem('todos_db', JSON.stringify(cloudData.todos));
-        }
-        console.log("✅ Đã đồng bộ dữ liệu từ Firebase Cloud thành công!");
-        if (typeof PatientManager !== 'undefined') PatientManager.init();
-        if (typeof TodoManager !== 'undefined') TodoManager.init();
-      }
-    } catch (err) {
-      console.error("❌ Lỗi kết nối Cloud:", err);
-    }
-  },
-
+  // Đẩy dữ liệu từ máy lên Cloud
   async syncToCloud() {
     try {
       const patients = JSON.parse(localStorage.getItem('patients_db') || '[]');
@@ -67,5 +48,42 @@ export const Storage = {
   }
 };
 
+// ⚡ LẮNG NGHE THAY ĐỔI THỜI GIAN THỰC (REAL-TIME SYNC)
+// Khi có bất kỳ thay đổi nào trên Cloud, hàm này sẽ tự động chạy ngay lập tức
+onSnapshot(CLOUD_DOC_REF, (docSnap) => {
+  if (docSnap.exists()) {
+    const cloudData = docSnap.data();
+    let hasChanged = false;
+
+    if (cloudData.patients) {
+      const localPatients = localStorage.getItem('patients_db');
+      const newPatientsStr = JSON.stringify(cloudData.patients);
+      if (localPatients !== newPatientsStr) {
+        localStorage.setItem('patients_db', newPatientsStr);
+        hasChanged = true;
+      }
+    }
+
+    if (cloudData.todos) {
+      const localTodos = localStorage.getItem('todos_db');
+      const newTodosStr = JSON.stringify(cloudData.todos);
+      if (localTodos !== newTodosStr) {
+        localStorage.setItem('todos_db', newTodosStr);
+        hasChanged = true;
+      }
+    }
+
+    // Nếu dữ liệu trên mây khác với local, tự động cập nhật lại giao diện ngay lập tức
+    if (hasChanged) {
+      console.log("⚡ Dữ liệu trên Cloud đã cập nhật, đang làm mới giao diện...");
+      if (typeof window.PatientManager !== 'undefined' && typeof window.PatientManager.init === 'function') {
+        window.PatientManager.init();
+      }
+      if (typeof window.TodoManager !== 'undefined' && typeof window.TodoManager.init === 'function') {
+        window.TodoManager.init();
+      }
+    }
+  }
+});
+
 window.Storage = Storage;
-Storage.syncFromCloud();
