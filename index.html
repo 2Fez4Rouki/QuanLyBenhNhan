@@ -24,10 +24,10 @@
         <div id="reminder-banner" class="hidden bg-amber-100 border-l-4 border-amber-500 text-amber-700 p-3 text-sm mb-4 rounded"></div>
 
         <div class="flex justify-between items-center mb-4">
-          <h2 class="font-bold text-xl text-blue-900">Danh Sách Bệnh Nhân</h2>
+          <h2 class="font-bold text-xl text-pink-200">Danh Sách Bệnh Nhân</h2>
           <div class="space-x-1 flex items-center flex-wrap gap-y-1">
             <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-amber-700 transition">📅 Tái khám</button>
-            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-blue-700 transition">👥 DS Bệnh Nhân</button>
+            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-blue-600 transition">👥 DS Bệnh Nhân</button>
             <button onclick="PatientManager.exportJSON()" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-green-700 transition">Xuất</button>
             <label class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-indigo-700 transition">
               Nhập <input type="file" accept=".json" onchange="PatientManager.importJSON(event)" class="hidden">

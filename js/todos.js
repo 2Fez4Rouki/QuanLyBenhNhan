@@ -21,11 +21,11 @@ const TodoManager = {
       const totalSubs = todo.subtasks ? todo.subtasks.length : 0;
       const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (todo.completed ? 100 : 0);
 
-      // 🔍 Thuật toán tự động tìm tên bệnh nhân trong tiêu đề task để tạo link bấm được
+      // 🔍 Tự động tìm tên bệnh nhân trong tiêu đề task để tạo link bấm được (đã làm sạch dấu ngoặc)
       let displayedTitle = todo.title || '';
       patients.forEach(p => {
         if (p.name && displayedTitle.includes(p.name)) {
-          const clickableName = `<span onclick="window.jumpToPatient('${p.name}')" class="text-blue-600 font-bold underline cursor-pointer hover:text-blue-800" title="Bấm để xem hồ sơ bệnh nhân">${p.name}</span>`;
+          const clickableName = `<span onclick="window.jumpToPatient('${p.name}')" class="text-blue-600 font-bold underline cursor-pointer hover:text-blue-800">${p.name}</span>`;
           const regex = new RegExp(p.name, 'g');
           displayedTitle = displayedTitle.replace(regex, clickableName);
         }
