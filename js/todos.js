@@ -7,7 +7,7 @@ const TodoManager = {
 
   render() {
     const rawTodos = Storage.getTodos();
-    const todos = Array.isArray(rawTodos) ? rawTodos : []; // 🛡️ Ép an toàn, tránh lỗi trắng trang nếu dữ liệu cũ chưa chuẩn
+    const todos = Array.isArray(rawTodos) ? rawTodos : []; // 🛡️ Ép an toàn tránh lỗi trắng trang
     const patients = Storage.getPatients(); // Lấy danh sách bệnh nhân để đối chiếu
     const container = document.getElementById('todo-list');
     if (!container) return;
@@ -16,10 +16,8 @@ const TodoManager = {
       container.innerHTML = `<p class="text-gray-500 text-center py-4">Chưa có công việc nào.</p>`;
       return;
     }
-    
-    // ... (các đoạn code render bên dưới giữ nguyên)
 
-    // 🔍 Tạo sẵn biểu thức Regex nhận diện tên bệnh nhân (sắp xếp từ dài đến ngắn để match chính xác)[cite: 6]
+    // 🔍 Tạo sẵn biểu thức Regex nhận diện tên bệnh nhân (sắp xếp từ dài đến ngắn để match chính xác)
     let regex = null;
     if (patients.length > 0) {
       const validNames = patients
@@ -33,7 +31,7 @@ const TodoManager = {
       }
     }
 
-    // 🔗 Hàm hỗ trợ biến tên bệnh nhân trong chuỗi thành thẻ span có thể bấm để chuyển tab[cite: 6]
+    // 🔗 Hàm hỗ trợ biến tên bệnh nhân trong chuỗi thành thẻ span có thể bấm để chuyển tab
     const formatTitleWithLinks = (text) => {
       if (!text) return '';
       if (!regex) return text;
@@ -47,7 +45,7 @@ const TodoManager = {
       const totalSubs = todo.subtasks ? todo.subtasks.length : 0;
       const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (todo.completed ? 100 : 0);
 
-      // Áp dụng link cho tiêu đề công việc chính[cite: 6]
+      // Áp dụng link cho tiêu đề công việc chính
       const displayedTitle = formatTitleWithLinks(todo.title || '');
 
       return `
@@ -63,7 +61,7 @@ const TodoManager = {
           <!-- Sub-tasks -->
           <div class="ml-8 mt-2 space-y-1">
             ${(todo.subtasks || []).map(sub => {
-              // Áp dụng link cho từng sub-task[cite: 6]
+              // Áp dụng link cho từng sub-task
               const displayedSubTitle = formatTitleWithLinks(sub.title || '');
               return `
                 <div class="flex items-center justify-between text-sm">
@@ -96,7 +94,7 @@ const TodoManager = {
     const titleInput = document.getElementById('todo-title');
     if (!titleInput || !titleInput.value.trim()) return;
 
-    const todos = Storage.getTodos();[cite: 6]
+    const todos = Storage.getTodos();
     const newTodo = {
       id: Date.now().toString(),
       title: titleInput.value.trim(),
@@ -104,31 +102,31 @@ const TodoManager = {
       subtasks: []
     };
     todos.push(newTodo);
-    Storage.saveTodos(todos);[cite: 6]
+    Storage.saveTodos(todos);
     this.render();
     e.target.reset();
   },
 
   toggleTodo(id) {
-    let todos = Storage.getTodos();[cite: 6]
+    let todos = Storage.getTodos();
     todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-    Storage.saveTodos(todos);[cite: 6]
+    Storage.saveTodos(todos);
     this.render();
   },
 
   deleteTodo(id) {
     if (!confirm('Bạn có chắc chắn muốn xóa công việc này?')) return;
 
-    let todos = Storage.getTodos();[cite: 6]
+    let todos = Storage.getTodos();
     todos = todos.filter(t => t.id !== id);
-    Storage.saveTodos(todos);[cite: 6]
+    Storage.saveTodos(todos);
     this.render();
   },
 
   addSub(todoId) {
     const input = document.getElementById(`sub-input-${todoId}`);
     if (!input || !input.value.trim()) return;
-    let todos = Storage.getTodos();[cite: 6]
+    let todos = Storage.getTodos();
     todos = todos.map(t => {
       if (t.id === todoId) {
         t.subtasks = t.subtasks || [];
@@ -136,33 +134,33 @@ const TodoManager = {
       }
       return t;
     });
-    Storage.saveTodos(todos);[cite: 6]
+    Storage.saveTodos(todos);
     this.render();
   },
 
   toggleSub(todoId, subId) {
-    let todos = Storage.getTodos();[cite: 6]
+    let todos = Storage.getTodos();
     todos = todos.map(t => {
       if (t.id === todoId) {
         t.subtasks = t.subtasks.map(s => s.id === subId ? { ...s, completed: !s.completed } : s);
       }
       return t;
     });
-    Storage.saveTodos(todos);[cite: 6]
+    Storage.saveTodos(todos);
     this.render();
   },
 
   deleteSub(todoId, subId) {
     if (!confirm('Bạn có chắc chắn muốn xóa công việc phụ này?')) return;
 
-    let todos = Storage.getTodos();[cite: 6]
+    let todos = Storage.getTodos();
     todos = todos.map(t => {
       if (t.id === todoId) {
         t.subtasks = t.subtasks.filter(s => s.id !== subId);
       }
       return t;
     });
-    Storage.saveTodos(todos);[cite: 6]
+    Storage.saveTodos(todos);
     this.render();
   }
 };
