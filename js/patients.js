@@ -1,5 +1,14 @@
 import { Storage } from './storage.js';
 
+// 🛠 Hàm phụ trợ lấy ngày chính xác theo giờ Local (tránh lệch UTC)
+function getLocalDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const PatientManager = {
   searchKeyword: '',
   editingId: null,
@@ -19,7 +28,7 @@ const PatientManager = {
     const allToggleBtn = document.getElementById('btn-all-toggle');
     if (!container) return;
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
     const todayList = patients.filter(p => p.nextDate === today);
 
     // 1. Render khu vực tái khám hôm nay
@@ -158,7 +167,7 @@ const PatientManager = {
             <div class="bg-blue-50 p-2 rounded-lg space-y-2 mt-2">
               <div class="text-xs font-semibold text-blue-800">Thêm đợt khám / tái khám mới:</div>
               <div class="flex space-x-1">
-                <input type="date" id="h-date-${p.id}" value="${new Date().toISOString().split('T')[0]}" class="text-xs border p-1 rounded w-1/3 bg-white">
+                <input type="date" id="h-date-${p.id}" value="${getLocalDateString()}" class="text-xs border p-1 rounded w-1/3 bg-white">
                 <input type="text" id="h-note-${p.id}" placeholder="Thông tin khám (vd: đã khám, đơn thuốc...)" class="text-xs border p-1 rounded flex-1 bg-white focus:outline-none focus:border-blue-500">
               </div>
               <button onclick="PatientManager.addHistory('${p.id}')" class="w-full bg-blue-600 text-white text-xs py-1 rounded font-medium hover:bg-blue-700">＋ Thêm Lịch Sử Khám</button>
@@ -300,7 +309,7 @@ const PatientManager = {
 
   checkReminders() {
     const patients = Storage.getPatients();
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
     const todayList = patients.filter(p => p.nextDate === today);
     const alertBox = document.getElementById('reminder-banner');
     
@@ -320,7 +329,7 @@ const PatientManager = {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `patients_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `patients_backup_${getLocalDateString()}.json`;
     a.click();
   },
 
