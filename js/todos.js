@@ -21,15 +21,23 @@ const TodoManager = {
       const totalSubs = todo.subtasks ? todo.subtasks.length : 0;
       const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (todo.completed ? 100 : 0);
 
-      // 🔍 Tự động tìm tên bệnh nhân trong tiêu đề task để tạo link bấm được (đã làm sạch dấu ngoặc)
+      // 🔍 Thuật toán thông minh: Lọc và sắp xếp tên bệnh nhân từ dài đến ngắn để match chính xác tuyệt đối
       let displayedTitle = todo.title || '';
-      patients.forEach(p => {
-        if (p.name && displayedTitle.includes(p.name)) {
-          const clickableName = `<span onclick="window.jumpToPatient('${p.name}')" class="text-black font-bold italic cursor-pointer hover:text-blue-800">${p.name}</span>`;
-          const regex = new RegExp(p.name, 'g');
-          displayedTitle = displayedTitle.replace(regex, clickableName);
+      if (patients.length > 0) {
+        const validNames = patients
+          .map(p => p.name)
+          .filter(name => name && name.trim().length > 0)
+          .sort((a, b) => b.length - a.length); // Tên dài ưu tiên xếp trước
+
+        if (validNames.length > 0) {
+          const escapedNames = validNames.map(name => name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+          const regex = new RegExp(`(${escapedNames.join('|')})`, 'g');
+          
+          displayedTitle = displayedTitle.replace(regex, (match) => {
+            return `<span onclick="window.jumpToPatient('${match}')" class="text-blue-600 font-bold underline cursor-pointer hover:text-blue-800">${match}</span>`;
+          });
         }
-      });
+      }
 
       return `
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3">
