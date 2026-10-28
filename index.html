@@ -26,10 +26,10 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="font-bold text-xl text-blue-900">Danh Sách Bệnh Nhân</h2>
           <div class="space-x-1 flex items-center flex-wrap gap-y-1">
-            <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-amber-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-amber-700 transition">📅 Tái khám</button>
-            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-blue-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-blue-700 transition">👥 DS Bệnh Nhân</button>
-            <button onclick="PatientManager.exportJSON()" class="bg-green-600 text-white text-xs px-2.5 py-1.5 rounded font-medium hover:bg-green-700 transition">Xuất</button>
-            <label class="bg-indigo-600 text-white text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-indigo-700 transition">
+            <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-amber-700 transition">📅 Tái khám</button>
+            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-blue-700 transition">👥 DS Bệnh Nhân</button>
+            <button onclick="PatientManager.exportJSON()" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-green-700 transition">Xuất</button>
+            <label class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-indigo-700 transition">
               Nhập <input type="file" accept=".json" onchange="PatientManager.importJSON(event)" class="hidden">
             </label>
           </div>
