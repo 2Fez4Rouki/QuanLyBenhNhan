@@ -78,10 +78,13 @@ const TodoManager = {
 
   addTodo(e) {
     e.preventDefault();
+    const titleInput = document.getElementById('todo-title');
+    if (!titleInput || !titleInput.value.trim()) return;
+
     const todos = Storage.getTodos();
     const newTodo = {
       id: Date.now().toString(),
-      title: document.getElementById('todo-title').value,
+      title: titleInput.value.trim(),
       completed: false,
       subtasks: []
     };
@@ -99,6 +102,9 @@ const TodoManager = {
   },
 
   deleteTodo(id) {
+    // 🛡️ Thêm hộp thoại xác nhận trước khi xóa công việc
+    if (!confirm('Bạn có chắc chắn muốn xóa công việc này?')) return;
+
     let todos = Storage.getTodos();
     todos = todos.filter(t => t.id !== id);
     Storage.saveTodos(todos);
@@ -112,7 +118,7 @@ const TodoManager = {
     todos = todos.map(t => {
       if (t.id === todoId) {
         t.subtasks = t.subtasks || [];
-        t.subtasks.push({ id: Date.now().toString(), title: input.value.trim(), completed: false });
+        t.subtasks.push({ id: Date.now().toString(), title: input.value.trim().replace(/['"]/g, ''), completed: false });
       }
       return t;
     });
