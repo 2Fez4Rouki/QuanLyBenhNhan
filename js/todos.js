@@ -7,6 +7,7 @@ const TodoManager = {
 
   render() {
     const todos = Storage.getTodos();
+    const patients = Storage.getPatients(); // Lấy danh sách bệnh nhân để đối chiếu
     const container = document.getElementById('todo-list');
     if (!container) return;
 
@@ -20,12 +21,22 @@ const TodoManager = {
       const totalSubs = todo.subtasks ? todo.subtasks.length : 0;
       const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (todo.completed ? 100 : 0);
 
+      // 🔍 Thuật toán tự động tìm tên bệnh nhân trong tiêu đề task để tạo link bấm được
+      let displayedTitle = todo.title || '';
+      patients.forEach(p => {
+        if (p.name && displayedTitle.includes(p.name)) {
+          const clickableName = `<span onclick="window.jumpToPatient('${p.name}')" class="text-blue-600 font-bold underline cursor-pointer hover:text-blue-800" title="Bấm để xem hồ sơ bệnh nhân">${p.name}</span>`;
+          const regex = new RegExp(p.name, 'g');
+          displayedTitle = displayedTitle.replace(regex, clickableName);
+        }
+      });
+
       return `
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
               <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="TodoManager.toggleTodo('${todo.id}')" class="w-5 h-5 text-blue-600 rounded">
-              <span class="font-bold text-gray-800 ${todo.completed ? 'line-through text-gray-400' : ''}">${todo.title}</span>
+              <span class="font-bold text-gray-800 ${todo.completed ? 'line-through text-gray-400' : ''}">${displayedTitle}</span>
             </div>
             <button onclick="TodoManager.deleteTodo('${todo.id}')" class="text-red-500 hover:text-red-700 text-sm">Xóa</button>
           </div>

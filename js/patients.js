@@ -35,8 +35,8 @@ const PatientManager = {
     if (todayContainer) {
       if (this.showTodayOnly) {
         if (todayToggleBtn) {
-          todayToggleBtn.classList.remove('bg-amber-600');
-          todayToggleBtn.classList.add('bg-amber-800', 'ring-2', 'ring-amber-300');
+          todayToggleBtn.classList.remove('bg-pink-200', 'text-rose-900');
+          todayToggleBtn.classList.add('bg-pink-400', 'text-white', 'ring-2', 'ring-pink-300');
         }
         
         if (todayList.length === 0) {
@@ -64,8 +64,8 @@ const PatientManager = {
         todayContainer.classList.remove('hidden');
       } else {
         if (todayToggleBtn) {
-          todayToggleBtn.classList.remove('bg-amber-800', 'ring-2', 'ring-amber-300');
-          todayToggleBtn.classList.add('bg-amber-600');
+          todayToggleBtn.classList.remove('bg-pink-400', 'text-white', 'ring-2', 'ring-pink-300');
+          todayToggleBtn.classList.add('bg-pink-200', 'text-rose-900');
         }
         todayContainer.classList.add('hidden');
       }

@@ -18,6 +18,17 @@ window.switchTab = function(tabId) {
   }
 };
 
+// Hàm chuyển sang tab Bệnh nhân và tìm kiếm chính xác tên/SĐT bệnh nhân đó
+window.jumpToPatient = function(keyword) {
+  // 1. Chuyển sang tab bệnh nhân bằng hàm switchTab có sẵn
+  window.switchTab('tab-patients');
+  
+  // 2. Gọi hàm tìm kiếm và focus vào bệnh nhân đó
+  if (window.PatientManager && typeof window.PatientManager.searchAndFocus === 'function') {
+    window.PatientManager.searchAndFocus(keyword);
+  }
+};
+
 // Đảm bảo khi DOM tải xong thì khởi tạo ứng dụng
 document.addEventListener('DOMContentLoaded', () => {
   console.log("🚀 Ứng dụng đã khởi động thành công!");
