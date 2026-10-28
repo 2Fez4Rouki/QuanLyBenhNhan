@@ -170,7 +170,7 @@ const PatientManager = {
                 <input type="date" id="h-date-${p.id}" value="${getLocalDateString()}" class="text-xs border p-1 rounded w-1/3 bg-white">
                 <input type="text" id="h-note-${p.id}" placeholder="Thông tin khám (vd: đã khám, đơn thuốc...)" class="text-xs border p-1 rounded flex-1 bg-white focus:outline-none focus:border-blue-500">
               </div>
-              <button onclick="PatientManager.addHistory('${p.id}')" class="w-full bg-blue-600 text-white text-xs py-1 rounded font-medium hover:bg-blue-700">＋ Thêm Lịch Sử Khám</button>
+              <button onclick="PatientManager.addHistory('${p.id}')" class="w-full bg-pink-200 text-rose-900 text-xs py-1 rounded font-medium hover:bg-blue-700">＋ Thêm Lịch Sử Khám</button>
             </div>
           </div>
         </div>
