@@ -6,7 +6,8 @@ const TodoManager = {
   },
 
   render() {
-    const todos = Storage.getTodos();[cite: 6]
+    const rawTodos = Storage.getTodos();
+    const todos = Array.isArray(rawTodos) ? rawTodos : []; // 🛡️ Ép an toàn, tránh lỗi trắng trang nếu dữ liệu cũ chưa chuẩn
     const patients = Storage.getPatients(); // Lấy danh sách bệnh nhân để đối chiếu
     const container = document.getElementById('todo-list');
     if (!container) return;
@@ -15,6 +16,8 @@ const TodoManager = {
       container.innerHTML = `<p class="text-gray-500 text-center py-4">Chưa có công việc nào.</p>`;
       return;
     }
+    
+    // ... (các đoạn code render bên dưới giữ nguyên)
 
     // 🔍 Tạo sẵn biểu thức Regex nhận diện tên bệnh nhân (sắp xếp từ dài đến ngắn để match chính xác)[cite: 6]
     let regex = null;
