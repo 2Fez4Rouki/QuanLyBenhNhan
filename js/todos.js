@@ -34,7 +34,7 @@ const TodoManager = {
           const regex = new RegExp(`(${escapedNames.join('|')})`, 'g');
           
           displayedTitle = displayedTitle.replace(regex, (match) => {
-            return `<span onclick="window.jumpToPatient('${match}')" class="text-blue-600 font-bold underline cursor-pointer hover:text-blue-800">${match}</span>`;
+            return `<span onclick="window.jumpToPatient('${match}')" class="text-gray-800 font-bold italic cursor-pointer hover:text-gray-950">${match}</span>`;
           });
         }
       }
