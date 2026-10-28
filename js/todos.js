@@ -139,6 +139,8 @@ const TodoManager = {
   },
 
   deleteSub(todoId, subId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa công việc phụ này?')) return;
+
     let todos = Storage.getTodos();
     todos = todos.map(t => {
       if (t.id === todoId) {
