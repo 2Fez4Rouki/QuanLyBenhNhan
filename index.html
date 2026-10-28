@@ -24,7 +24,6 @@
         <div id="reminder-banner" class="hidden bg-amber-100 border-l-4 border-amber-500 text-amber-700 p-3 text-sm mb-4 rounded"></div>
 
         <div class="flex justify-between items-center mb-4">
-          <h2 class="font-bold text-xl text-pink-200">Danh Sách Bệnh Nhân</h2>
           <div class="space-x-1 flex items-center flex-wrap gap-y-1">
             <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-amber-700 transition">📅 Tái khám</button>
             <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-300 transition">👥 DS Bệnh Nhân</button>
@@ -63,7 +62,6 @@
 
       <!-- Tab 2: Todos -->
       <div id="tab-todos" class="tab-content hidden">
-        <h2 class="font-bold text-xl text-blue-900 mb-4">Danh Sách Công Việc</h2>
         
         <form onsubmit="TodoManager.addTodo(event)" class="flex space-x-2 mb-4">
           <input type="text" id="todo-title" placeholder="Thêm công việc chính mới..." required class="flex-1 text-sm border p-2 rounded-xl focus:outline-none focus:border-blue-500">
