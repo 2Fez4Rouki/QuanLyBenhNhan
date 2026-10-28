@@ -10,6 +10,20 @@ const firebaseConfig = {
   appId: "1:913701784617:web:e5ca081d48d345268da038"
 };
 
+// Hàm chuyển đổi từ 2026-11-10 thành 10/11/2026
+function formatDateVN(dateString) {
+  if (!dateString) return '';
+  // Nếu dữ liệu cũ chỉ lưu năm (vd: "2026"), giữ nguyên không đổi
+  if (dateString.length === 4) return dateString; 
+  
+  const parts = dateString.split('-');
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+    return `${day}/${month}/${year}`;
+  }
+  return dateString; // Trả về nguyên bản nếu không khớp định dạng
+}
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const CLOUD_DOC_REF = doc(db, "meditask", "main_data");

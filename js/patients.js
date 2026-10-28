@@ -9,6 +9,19 @@ function getLocalDateString() {
   return `${year}-${month}-${day}`;
 }
 
+// 📅 Hàm chuyển đổi định dạng từ YYYY-MM-DD sang DD/MM/YYYY để hiển thị đẹp mắt
+function formatDateVN(dateString) {
+  if (!dateString) return '';
+  if (dateString.length === 4) return dateString; // Trường hợp chỉ lưu năm (năm sinh)
+  
+  const parts = dateString.split('-');
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+    return `${day}/${month}/${year}`;
+  }
+  return dateString;
+}
+
 const PatientManager = {
   searchKeyword: '',
   editingId: null,
@@ -40,7 +53,7 @@ const PatientManager = {
         }
         
         if (todayList.length === 0) {
-          todayContainer.innerHTML = `<div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800 text-center">Hôm nay (${today}) không có bệnh nhân nào lịch tái khám.</div>`;
+          todayContainer.innerHTML = `<div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800 text-center">Hôm nay (${formatDateVN(today)}) không có bệnh nhân nào lịch tái khám.</div>`;
         } else {
           todayContainer.innerHTML = `
             <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl shadow-sm space-y-2">
@@ -74,11 +87,9 @@ const PatientManager = {
     // 2. Cập nhật giao diện nút DS Bệnh Nhân (Đổi sang tông hồng cho đồng bộ)
     if (allToggleBtn) {
       if (this.showAllPatients) {
-        // Khi đang bật xem toàn bộ danh sách (Hồng đậm hơn + viền)
         allToggleBtn.classList.remove('bg-pink-200', 'text-rose-900');
         allToggleBtn.classList.add('bg-pink-400', 'text-white', 'ring-2', 'ring-pink-300');
       } else {
-        // Khi đang tắt (Hồng nhạt ban đầu)
         allToggleBtn.classList.remove('bg-pink-400', 'text-white', 'ring-2', 'ring-pink-300');
         allToggleBtn.classList.add('bg-pink-200', 'text-rose-900');
       }
@@ -116,7 +127,7 @@ const PatientManager = {
             <div class="font-bold text-sm text-blue-900 mb-1">Chỉnh sửa thông tin bệnh nhân</div>
             <input type="text" id="edit-name-${p.id}" value="${p.name || ''}" placeholder="Họ tên" class="w-full text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
             <div class="flex space-x-2">
-              <input type="date" id="edit-dob-${p.id}" value="${p.dob || ''}" class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+              <input type="number" id="edit-dob-${p.id}" value="${p.dob || ''}" placeholder="Năm sinh (vd: 1990)" min="1900" max="2100" class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
               <input type="tel" id="edit-phone-${p.id}" value="${p.phone || ''}" placeholder="SĐT" class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
             </div>
             <div class="flex items-center space-x-2">
@@ -132,10 +143,11 @@ const PatientManager = {
         `;
       }
 
+      // 📅 Áp dụng formatDateVN cho ngày trong lịch sử khám
       const historyList = (p.history || []).map(h => `
         <div class="flex justify-between items-center text-xs bg-white p-2 rounded border border-gray-100 mb-1">
           <div>
-            <span class="font-semibold text-blue-700">📅 ${h.date}</span>: ${h.note}
+            <span class="font-semibold text-blue-700">📅 ${formatDateVN(h.date)}</span>: ${h.note}
           </div>
           <button onclick="PatientManager.deleteHistory('${p.id}', '${h.id}')" class="text-red-400 hover:text-red-600 font-bold ml-2">✕</button>
         </div>
@@ -147,7 +159,8 @@ const PatientManager = {
             <div>
               <h3 class="font-bold text-lg text-blue-900">${p.name}</h3>
               <p class="text-sm text-gray-600">📞 ${p.phone} | 📅 NS: ${p.dob}</p>
-              <p class="text-sm text-amber-600 font-medium mt-1">🔄 Tái khám: ${p.nextDate || 'Chưa có lịch'}</p>
+              <!-- 📅 Áp dụng formatDateVN cho ngày tái khám -->
+              <p class="text-sm text-amber-600 font-medium mt-1">🔄 Tái khám: ${p.nextDate ? formatDateVN(p.nextDate) : 'Chưa có lịch'}</p>
             </div>
             <div class="flex space-x-2 items-center">
               <button onclick="PatientManager.startEdit('${p.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">Sửa</button>
@@ -222,7 +235,7 @@ const PatientManager = {
     const note = document.getElementById(`edit-note-${id}`).value;
 
     if (!name || !dob || !phone) {
-      alert('Vui lòng điền đầy đủ các thông tin bắt buộc (Tên, Ngày sinh, SĐT)!');
+      alert('Vui lòng điền đầy đủ các thông tin bắt buộc (Tên, Năm sinh, SĐT)!');
       return;
     }
 
@@ -318,7 +331,8 @@ const PatientManager = {
     if (alertBox) {
       if (todayList.length > 0) {
         alertBox.classList.remove('hidden');
-        alertBox.innerHTML = `⚠️ Có <strong>${todayList.length} bệnh nhân</strong> cần tái khám hôm nay (${today}): ${todayList.map(p => p.name).join(', ')}`;
+        // 📅 Áp dụng formatDateVN cho cảnh báo tái khám hôm nay
+        alertBox.innerHTML = `⚠️ Có <strong>${todayList.length} bệnh nhân</strong> cần tái khám hôm nay (${formatDateVN(today)}): ${todayList.map(p => p.name).join(', ')}`;
       } else {
         alertBox.classList.add('hidden');
       }
@@ -354,5 +368,4 @@ const PatientManager = {
   }
 };
 
-// Gắn ra window để các thẻ HTML onclick gọi được
 window.PatientManager = PatientManager;

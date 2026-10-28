@@ -46,7 +46,7 @@
         <form onsubmit="PatientManager.addPatient(event)" class="bg-gray-50 p-3 rounded-xl border mb-4 space-y-2">
           <input type="text" id="p-name" placeholder="Họ tên bệnh nhân" required class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
           <div class="flex space-x-2">
-            <input type="date" id="p-dob" title="Ngày sinh" required class="w-1/2 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
+            <input type="number" id="p-dob" placeholder="Năm sinh (vd: 1990)" min="1900" max="2100" required class="w-1/2 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
             <input type="tel" id="p-phone" placeholder="Số điện thoại" required class="w-1/2 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
           </div>
           <div class="flex items-center space-x-2">
