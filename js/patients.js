@@ -71,14 +71,16 @@ const PatientManager = {
       }
     }
 
-    // 2. Cập nhật giao diện nút DS Bệnh Nhân
+    // 2. Cập nhật giao diện nút DS Bệnh Nhân (Đổi sang tông hồng cho đồng bộ)
     if (allToggleBtn) {
       if (this.showAllPatients) {
-        allToggleBtn.classList.remove('bg-blue-600');
-        allToggleBtn.classList.add('bg-blue-800', 'ring-2', 'ring-blue-300');
+        // Khi đang bật xem toàn bộ danh sách (Hồng đậm hơn + viền)
+        allToggleBtn.classList.remove('bg-pink-200', 'text-rose-900');
+        allToggleBtn.classList.add('bg-pink-400', 'text-white', 'ring-2', 'ring-pink-300');
       } else {
-        allToggleBtn.classList.remove('bg-blue-800', 'ring-2', 'ring-blue-300');
-        allToggleBtn.classList.add('bg-blue-600');
+        // Khi đang tắt (Hồng nhạt ban đầu)
+        allToggleBtn.classList.remove('bg-pink-400', 'text-white', 'ring-2', 'ring-pink-300');
+        allToggleBtn.classList.add('bg-pink-200', 'text-rose-900');
       }
     }
 

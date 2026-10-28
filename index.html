@@ -27,7 +27,7 @@
           <h2 class="font-bold text-xl text-pink-200">Danh Sách Bệnh Nhân</h2>
           <div class="space-x-1 flex items-center flex-wrap gap-y-1">
             <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-amber-700 transition">📅 Tái khám</button>
-            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-blue-600 transition">👥 DS Bệnh Nhân</button>
+            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-300 transition">👥 DS Bệnh Nhân</button>
             <button onclick="PatientManager.exportJSON()" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-green-700 transition">Xuất</button>
             <label class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-indigo-700 transition">
               Nhập <input type="file" accept=".json" onchange="PatientManager.importJSON(event)" class="hidden">

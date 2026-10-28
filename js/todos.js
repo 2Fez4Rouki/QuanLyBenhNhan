@@ -25,7 +25,7 @@ const TodoManager = {
       let displayedTitle = todo.title || '';
       patients.forEach(p => {
         if (p.name && displayedTitle.includes(p.name)) {
-          const clickableName = `<span onclick="window.jumpToPatient('${p.name}')" class="text-blue-600 font-bold underline cursor-pointer hover:text-blue-800">${p.name}</span>`;
+          const clickableName = `<span onclick="window.jumpToPatient('${p.name}')" class="text-black font-bold italic cursor-pointer hover:text-blue-800">${p.name}</span>`;
           const regex = new RegExp(p.name, 'g');
           displayedTitle = displayedTitle.replace(regex, clickableName);
         }
