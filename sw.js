@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meditask-v4'; // 💡 Nhớ tăng version này lên mỗi khi bạn deploy code mới (v3, v4, v5...)
+const CACHE_NAME = 'meditask-v5'; // 💡 Nhớ tăng version này lên mỗi khi bạn deploy code mới (v3, v4, v5...)
 const assets = [
   './',
   './index.html',
