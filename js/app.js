@@ -4,7 +4,7 @@ import { Storage } from './storage.js';
 window.switchTab = function(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('bg-blue-600', 'text-white');
+    btn.classList.remove('bg-blue-600', 'text-blue-950');
     btn.classList.add('bg-gray-200', 'text-gray-700');
   });
 
@@ -14,7 +14,7 @@ window.switchTab = function(tabId) {
   const targetBtn = document.getElementById('btn-' + tabId);
   if (targetBtn) {
     targetBtn.classList.remove('bg-gray-200', 'text-gray-700');
-    targetBtn.classList.add('bg-blue-600', 'text-white');
+    targetBtn.classList.add('bg-blue-600', 'text-blue-950');
   }
 };
 

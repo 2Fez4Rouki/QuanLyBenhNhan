@@ -25,10 +25,10 @@
 
         <div class="flex justify-between items-center mb-4">
           <div class="space-x-1 flex items-center flex-wrap gap-y-1">
-            <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-amber-700 transition">📅 Tái khám</button>
-            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-300 transition">👥 DS Bệnh Nhân</button>
-            <button onclick="PatientManager.exportJSON()" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-green-700 transition">Xuất</button>
-            <label class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-indigo-700 transition">
+            <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-400 transition">📅 Tái khám</button>
+            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-400 transition">👥 DS Bệnh Nhân</button>
+            <button onclick="PatientManager.exportJSON()" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-400 transition">Xuất</button>
+            <label class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-pink-400 transition">
               Nhập <input type="file" accept=".json" onchange="PatientManager.importJSON(event)" class="hidden">
             </label>
           </div>
@@ -54,7 +54,7 @@
             <input type="date" id="p-next-date" class="flex-1 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
           </div>
           <textarea id="p-note" placeholder="Ghi chú tổng quan bệnh lý..." class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500"></textarea>
-          <button type="submit" class="w-full bg-pink-200 text-rose-900 py-2 rounded font-medium text-sm hover:bg-blue-700">Thêm Bệnh Nhân</button>
+          <button type="submit" class="w-full bg-pink-200 text-rose-900 py-2 rounded font-medium text-sm hover:bg-pink-400">Thêm Bệnh Nhân</button>
         </form>
 
         <div id="patient-list"></div>
