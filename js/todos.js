@@ -65,10 +65,10 @@ const TodoManager = {
               const displayedSubTitle = formatTitleWithLinks(sub.title || '');
               return `
                 <div class="flex items-center justify-between text-sm">
-                  <label class="flex items-center space-x-2 cursor-pointer">
+                  <div class="flex items-center space-x-2">
                     <input type="checkbox" ${sub.completed ? 'checked' : ''} onchange="TodoManager.toggleSub('${todo.id}', '${sub.id}')" class="w-4 h-4 text-blue-500 rounded">
                     <span class="${sub.completed ? 'line-through text-gray-400' : 'text-gray-600'}">${displayedSubTitle}</span>
-                  </label>
+                  </div>
                   <button onclick="TodoManager.deleteSub('${todo.id}', '${sub.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
                 </div>
               `;
