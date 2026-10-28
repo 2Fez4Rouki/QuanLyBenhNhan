@@ -6,7 +6,7 @@ const TodoManager = {
   },
 
   render() {
-    const todos = Storage.getTodos();
+    const todos = Storage.getTodos();[cite: 6]
     const patients = Storage.getPatients(); // Lấy danh sách bệnh nhân để đối chiếu
     const container = document.getElementById('todo-list');
     if (!container) return;
@@ -16,28 +16,36 @@ const TodoManager = {
       return;
     }
 
+    // 🔍 Tạo sẵn biểu thức Regex nhận diện tên bệnh nhân (sắp xếp từ dài đến ngắn để match chính xác)[cite: 6]
+    let regex = null;
+    if (patients.length > 0) {
+      const validNames = patients
+        .map(p => p.name)
+        .filter(name => name && name.trim().length > 0)
+        .sort((a, b) => b.length - a.length);
+
+      if (validNames.length > 0) {
+        const escapedNames = validNames.map(name => name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
+        regex = new RegExp(`(${escapedNames.join('|')})`, 'g');
+      }
+    }
+
+    // 🔗 Hàm hỗ trợ biến tên bệnh nhân trong chuỗi thành thẻ span có thể bấm để chuyển tab[cite: 6]
+    const formatTitleWithLinks = (text) => {
+      if (!text) return '';
+      if (!regex) return text;
+      return text.replace(regex, (match) => {
+        return `<span onclick="window.jumpToPatient('${match}')" class="text-gray-800 font-bold italic cursor-pointer hover:text-gray-950">${match}</span>`;
+      });
+    };
+
     container.innerHTML = todos.map(todo => {
       const completedSubs = todo.subtasks ? todo.subtasks.filter(s => s.completed).length : 0;
       const totalSubs = todo.subtasks ? todo.subtasks.length : 0;
       const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (todo.completed ? 100 : 0);
 
-      // 🔍 Thuật toán thông minh: Lọc và sắp xếp tên bệnh nhân từ dài đến ngắn để match chính xác tuyệt đối
-      let displayedTitle = todo.title || '';
-      if (patients.length > 0) {
-        const validNames = patients
-          .map(p => p.name)
-          .filter(name => name && name.trim().length > 0)
-          .sort((a, b) => b.length - a.length); // Tên dài ưu tiên xếp trước
-
-        if (validNames.length > 0) {
-          const escapedNames = validNames.map(name => name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
-          const regex = new RegExp(`(${escapedNames.join('|')})`, 'g');
-          
-          displayedTitle = displayedTitle.replace(regex, (match) => {
-            return `<span onclick="window.jumpToPatient('${match}')" class="text-gray-800 font-bold italic cursor-pointer hover:text-gray-950">${match}</span>`;
-          });
-        }
-      }
+      // Áp dụng link cho tiêu đề công việc chính[cite: 6]
+      const displayedTitle = formatTitleWithLinks(todo.title || '');
 
       return `
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3">
@@ -51,15 +59,19 @@ const TodoManager = {
           
           <!-- Sub-tasks -->
           <div class="ml-8 mt-2 space-y-1">
-            ${(todo.subtasks || []).map(sub => `
-              <div class="flex items-center justify-between text-sm">
-                <label class="flex items-center space-x-2 cursor-pointer">
-                  <input type="checkbox" ${sub.completed ? 'checked' : ''} onchange="TodoManager.toggleSub('${todo.id}', '${sub.id}')" class="w-4 h-4 text-blue-500 rounded">
-                  <span class="${sub.completed ? 'line-through text-gray-400' : 'text-gray-600'}">${sub.title}</span>
-                </label>
-                <button onclick="TodoManager.deleteSub('${todo.id}', '${sub.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
-              </div>
-            `).join('')}
+            ${(todo.subtasks || []).map(sub => {
+              // Áp dụng link cho từng sub-task[cite: 6]
+              const displayedSubTitle = formatTitleWithLinks(sub.title || '');
+              return `
+                <div class="flex items-center justify-between text-sm">
+                  <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" ${sub.completed ? 'checked' : ''} onchange="TodoManager.toggleSub('${todo.id}', '${sub.id}')" class="w-4 h-4 text-blue-500 rounded">
+                    <span class="${sub.completed ? 'line-through text-gray-400' : 'text-gray-600'}">${displayedSubTitle}</span>
+                  </label>
+                  <button onclick="TodoManager.deleteSub('${todo.id}', '${sub.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
+                </div>
+              `;
+            }).join('')}
             
             <div class="flex mt-2 space-x-2">
               <input type="text" id="sub-input-${todo.id}" placeholder="Thêm sub-task..." class="text-xs border rounded px-2 py-1 flex-1 focus:outline-none focus:border-blue-500">
@@ -81,7 +93,7 @@ const TodoManager = {
     const titleInput = document.getElementById('todo-title');
     if (!titleInput || !titleInput.value.trim()) return;
 
-    const todos = Storage.getTodos();
+    const todos = Storage.getTodos();[cite: 6]
     const newTodo = {
       id: Date.now().toString(),
       title: titleInput.value.trim(),
@@ -89,32 +101,31 @@ const TodoManager = {
       subtasks: []
     };
     todos.push(newTodo);
-    Storage.saveTodos(todos);
+    Storage.saveTodos(todos);[cite: 6]
     this.render();
     e.target.reset();
   },
 
   toggleTodo(id) {
-    let todos = Storage.getTodos();
+    let todos = Storage.getTodos();[cite: 6]
     todos = todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-    Storage.saveTodos(todos);
+    Storage.saveTodos(todos);[cite: 6]
     this.render();
   },
 
   deleteTodo(id) {
-    // 🛡️ Thêm hộp thoại xác nhận trước khi xóa công việc
     if (!confirm('Bạn có chắc chắn muốn xóa công việc này?')) return;
 
-    let todos = Storage.getTodos();
+    let todos = Storage.getTodos();[cite: 6]
     todos = todos.filter(t => t.id !== id);
-    Storage.saveTodos(todos);
+    Storage.saveTodos(todos);[cite: 6]
     this.render();
   },
 
   addSub(todoId) {
     const input = document.getElementById(`sub-input-${todoId}`);
     if (!input || !input.value.trim()) return;
-    let todos = Storage.getTodos();
+    let todos = Storage.getTodos();[cite: 6]
     todos = todos.map(t => {
       if (t.id === todoId) {
         t.subtasks = t.subtasks || [];
@@ -122,33 +133,33 @@ const TodoManager = {
       }
       return t;
     });
-    Storage.saveTodos(todos);
+    Storage.saveTodos(todos);[cite: 6]
     this.render();
   },
 
   toggleSub(todoId, subId) {
-    let todos = Storage.getTodos();
+    let todos = Storage.getTodos();[cite: 6]
     todos = todos.map(t => {
       if (t.id === todoId) {
         t.subtasks = t.subtasks.map(s => s.id === subId ? { ...s, completed: !s.completed } : s);
       }
       return t;
     });
-    Storage.saveTodos(todos);
+    Storage.saveTodos(todos);[cite: 6]
     this.render();
   },
 
   deleteSub(todoId, subId) {
     if (!confirm('Bạn có chắc chắn muốn xóa công việc phụ này?')) return;
 
-    let todos = Storage.getTodos();
+    let todos = Storage.getTodos();[cite: 6]
     todos = todos.map(t => {
       if (t.id === todoId) {
         t.subtasks = t.subtasks.filter(s => s.id !== subId);
       }
       return t;
     });
-    Storage.saveTodos(todos);
+    Storage.saveTodos(todos);[cite: 6]
     this.render();
   }
 };

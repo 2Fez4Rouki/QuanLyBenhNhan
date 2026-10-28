@@ -158,7 +158,7 @@ const PatientManager = {
           <div class="flex justify-between items-start">
             <div>
               <h3 class="font-bold text-lg text-blue-900">${p.name}</h3>
-              <p class="text-sm text-gray-600">📞 ${p.phone} | 📅 NS: ${p.dob}</p>
+              <p class="text-sm text-gray-600">📞 ${p.phone} | 📅 Năm sinh: ${p.dob}</p>
               <!-- 📅 Áp dụng formatDateVN cho ngày tái khám -->
               <p class="text-sm text-amber-600 font-medium mt-1">🔄 Tái khám: ${p.nextDate ? formatDateVN(p.nextDate) : 'Chưa có lịch'}</p>
             </div>
