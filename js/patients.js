@@ -54,7 +54,7 @@ const PatientManager = {
                     <div>
                       <span class="font-bold text-blue-900">${p.name}</span> - 📞 ${p.phone}
                     </div>
-                    <button onclick="PatientManager.searchAndFocus('${p.phone}')" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700">Xem/Sửa</button>
+                    <button onclick="PatientManager.searchAndFocus('${p.phone}')" class="bg-pink-600 text-white px-2 py-1 rounded hover:bg-blue-700">Xem/Sửa</button>
                   </div>
                 `).join('')}
               </div>
