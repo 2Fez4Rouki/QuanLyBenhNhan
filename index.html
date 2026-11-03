@@ -26,7 +26,7 @@
         <div class="flex justify-between items-center mb-4">
           <div class="space-x-1 flex items-center flex-wrap gap-y-1">
             <button onclick="PatientManager.toggleTodayList()" id="btn-today-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-400 transition">📅 Tái khám</button>
-            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-400 transition">👥 DS Bệnh Nhân</button>
+            <button onclick="PatientManager.toggleAllPatientsList()" id="btn-all-toggle" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-400 transition">👥 DS Bệnh Nhân <span id="patient-count" class="bg-rose-900 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">0</span></button>
             <button onclick="PatientManager.exportJSON()" class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium hover:bg-pink-400 transition">Xuất</button>
             <label class="bg-pink-200 text-rose-900 text-xs px-2.5 py-1.5 rounded font-medium cursor-pointer hover:bg-pink-400 transition">
               Nhập <input type="file" accept=".json" onchange="PatientManager.importJSON(event)" class="hidden">
