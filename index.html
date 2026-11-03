@@ -38,8 +38,9 @@
         <div id="today-patient-container" class="hidden mb-4"></div>
 
         <!-- Search Bar -->
-        <div class="mb-3">
-          <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border p-2 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
+        <div class="mb-3 relative">
+          <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
+          <button id="p-search-clear" onclick="PatientManager.clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
 
         <!-- Add Patient Form -->
