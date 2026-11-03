@@ -39,12 +39,12 @@
 
         <!-- Search Bar -->
         <div class="mb-3 relative">
-          <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
+          <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border-2 border-gray-600 p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
           <button id="p-search-clear" onclick="PatientManager.clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
 
         <!-- Add Patient Form -->
-        <form onsubmit="PatientManager.addPatient(event)" class="bg-gray-50 p-3 rounded-xl border mb-4 space-y-2">
+        <form onsubmit="PatientManager.addPatient(event)" class="bg-green-100 p-3 rounded-xl border-2 border-green-600 mb-4 space-y-2">
           <input type="text" id="p-name" placeholder="Họ tên bệnh nhân" required class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
           <div class="flex space-x-2">
             <input type="number" id="p-dob" placeholder="Năm sinh (vd: 1990)" min="1900" max="2100" required class="w-1/2 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
