@@ -44,6 +44,9 @@ const PatientManager = {
     const today = getLocalDateString();
     const todayList = patients.filter(p => p.nextDate === today);
 
+    const countEl = document.getElementById('patient-count');
+    if (countEl) countEl.textContent = patients.length;
+
     // 1. Render khu vực tái khám hôm nay
     if (todayContainer) {
       if (this.showTodayOnly) {
