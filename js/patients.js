@@ -101,10 +101,12 @@ const PatientManager = {
     let targetList = [];
     if (keyword) {
       targetList = patients.filter(p => {
+        const nextDateVN = p.nextDate ? formatDateVN(p.nextDate) : '';
         return (
           (p.name && p.name.toLowerCase().includes(keyword)) ||
           (p.phone && p.phone.toLowerCase().includes(keyword)) ||
           (p.nextDate && p.nextDate.includes(keyword)) ||
+          (nextDateVN && nextDateVN.includes(keyword)) ||
           (p.dob && p.dob.includes(keyword))
         );
       });
@@ -214,6 +216,17 @@ const PatientManager = {
 
   handleSearch(e) {
     this.searchKeyword = e.target.value;
+    const clearBtn = document.getElementById('p-search-clear');
+    if (clearBtn) clearBtn.classList.toggle('hidden', !this.searchKeyword);
+    this.render();
+  },
+
+  clearSearch() {
+    this.searchKeyword = '';
+    const searchInput = document.getElementById('p-search');
+    if (searchInput) searchInput.value = '';
+    const clearBtn = document.getElementById('p-search-clear');
+    if (clearBtn) clearBtn.classList.add('hidden');
     this.render();
   },
 
