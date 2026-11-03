@@ -40,7 +40,7 @@ const TodoManager = {
       });
     };
 
-    container.innerHTML = todos.map(todo => {
+    container.innerHTML = todos.map((todo, index) => {
       const completedSubs = todo.subtasks ? todo.subtasks.filter(s => s.completed).length : 0;
       const totalSubs = todo.subtasks ? todo.subtasks.length : 0;
       const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (todo.completed ? 100 : 0);
@@ -55,7 +55,13 @@ const TodoManager = {
               <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="TodoManager.toggleTodo('${todo.id}')" class="w-5 h-5 text-blue-600 rounded">
               <span class="font-bold text-gray-800 ${todo.completed ? 'line-through text-gray-400' : ''}">${displayedTitle}</span>
             </div>
-            <button onclick="TodoManager.deleteTodo('${todo.id}')" class="text-red-500 hover:text-red-700 text-sm">Xóa</button>
+            <div class="flex items-center space-x-2">
+              <div class="flex flex-col">
+                <button onclick="TodoManager.moveUp('${todo.id}')" ${index === 0 ? 'disabled' : ''} class="text-gray-400 hover:text-gray-700 leading-none text-xs disabled:opacity-20">▲</button>
+                <button onclick="TodoManager.moveDown('${todo.id}')" ${index === todos.length - 1 ? 'disabled' : ''} class="text-gray-400 hover:text-gray-700 leading-none text-xs disabled:opacity-20">▼</button>
+              </div>
+              <button onclick="TodoManager.deleteTodo('${todo.id}')" class="text-red-500 hover:text-red-700 text-sm">Xóa</button>
+            </div>
           </div>
           
           <!-- Sub-tasks -->
@@ -119,6 +125,24 @@ const TodoManager = {
 
     let todos = Storage.getTodos();
     todos = todos.filter(t => t.id !== id);
+    Storage.saveTodos(todos);
+    this.render();
+  },
+
+  moveUp(id) {
+    let todos = Storage.getTodos();
+    const i = todos.findIndex(t => t.id === id);
+    if (i <= 0) return;
+    [todos[i - 1], todos[i]] = [todos[i], todos[i - 1]];
+    Storage.saveTodos(todos);
+    this.render();
+  },
+
+  moveDown(id) {
+    let todos = Storage.getTodos();
+    const i = todos.findIndex(t => t.id === id);
+    if (i < 0 || i >= todos.length - 1) return;
+    [todos[i], todos[i + 1]] = [todos[i + 1], todos[i]];
     Storage.saveTodos(todos);
     this.render();
   },
