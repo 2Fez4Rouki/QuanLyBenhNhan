@@ -24,6 +24,16 @@ function formatDateVN(dateString) {
   return dateString; // Trả về nguyên bản nếu không khớp định dạng
 }
 
+// Hàm chuẩn hóa object để sắp xếp key, tránh lỗi lệch thứ tự khi so sánh JSON
+function sortObjectKeys(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sortObjectKeys);
+  return Object.keys(obj).sort().reduce((sorted, key) => {
+    sorted[key] = sortObjectKeys(obj[key]);
+    return sorted;
+  }, {});
+}
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const CLOUD_DOC_REF = doc(db, "meditask", "main_data");
@@ -63,33 +73,43 @@ export const Storage = {
 };
 
 // ⚡ LẮNG NGHE THAY ĐỔI THỜI GIAN THỰC (REAL-TIME SYNC)
-// Khi có bất kỳ thay đổi nào trên Cloud, hàm này sẽ tự động chạy ngay lập tức
 onSnapshot(CLOUD_DOC_REF, (docSnap) => {
   if (docSnap.exists()) {
     const cloudData = docSnap.data();
     let hasChanged = false;
 
+    // Kiểm tra dữ liệu Patients
     if (cloudData.patients) {
-      const localPatients = localStorage.getItem('patients_db');
-      const newPatientsStr = JSON.stringify(cloudData.patients);
-      if (localPatients !== newPatientsStr) {
-        localStorage.setItem('patients_db', newPatientsStr);
+      const localPatientsRaw = localStorage.getItem('patients_db');
+      const localPatientsObj = localPatientsRaw ? JSON.parse(localPatientsRaw) : [];
+      
+      // So sánh qua hàm sắp xếp key để tuyệt đối chính xác
+      const currentCloudStr = JSON.stringify(sortObjectKeys(cloudData.patients));
+      const currentLocalStr = JSON.stringify(sortObjectKeys(localPatientsObj));
+
+      if (currentLocalStr !== currentCloudStr) {
+        localStorage.setItem('patients_db', JSON.stringify(cloudData.patients));
         hasChanged = true;
       }
     }
 
+    // Kiểm tra dữ liệu Todos
     if (cloudData.todos) {
-      const localTodos = localStorage.getItem('todos_db');
-      const newTodosStr = JSON.stringify(cloudData.todos);
-      if (localTodos !== newTodosStr) {
-        localStorage.setItem('todos_db', newTodosStr);
+      const localTodosRaw = localStorage.getItem('todos_db');
+      const localTodosObj = localTodosRaw ? JSON.parse(localTodosRaw) : [];
+
+      const currentCloudStr = JSON.stringify(sortObjectKeys(cloudData.todos));
+      const currentLocalStr = JSON.stringify(sortObjectKeys(localTodosObj));
+
+      if (currentLocalStr !== currentCloudStr) {
+        localStorage.setItem('todos_db', JSON.stringify(cloudData.todos));
         hasChanged = true;
       }
     }
 
-    // Nếu dữ liệu trên mây khác với local, tự động cập nhật lại giao diện ngay lập tức
+    // Nếu dữ liệu trên mây khác biệt, tự động cập nhật lại giao diện ngay lập tức
     if (hasChanged) {
-      console.log("⚡ Dữ liệu trên Cloud đã cập nhật, đang làm mới giao diện...");
+      console.log("⚡ Dữ liệu trên Cloud đã thay đổi, đang làm mới giao diện trên thiết bị này...");
       if (typeof window.PatientManager !== 'undefined' && typeof window.PatientManager.init === 'function') {
         window.PatientManager.init();
       }
@@ -98,6 +118,8 @@ onSnapshot(CLOUD_DOC_REF, (docSnap) => {
       }
     }
   }
+}, (error) => {
+  console.error("❌ Lỗi kết nối Realtime Firestore:", error);
 });
 
 window.Storage = Storage;
