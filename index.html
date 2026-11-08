@@ -16,6 +16,13 @@
       <h2 class="text-center font-bold text-rose-900 text-lg">🔒 Đăng Nhập Hệ Thống</h2>
       <input type="email" id="auth-email" placeholder="Email của bạn" class="w-full text-sm border p-3 rounded-xl bg-white focus:outline-none focus:border-pink-500">
       <input type="password" id="auth-password" placeholder="Mật khẩu" class="w-full text-sm border p-3 rounded-xl bg-white focus:outline-none focus:border-pink-500">
+      
+      <!-- Ô tích nhớ mật khẩu -->
+      <div class="flex items-center space-x-2 text-sm text-gray-700">
+        <input type="checkbox" id="remember-pass" class="w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500 cursor-pointer">
+        <label for="remember-pass" class="cursor-pointer select-none text-xs font-medium text-gray-600">Nhớ mật khẩu cho lần sau</label>
+      </div>
+
       <button onclick="AuthManager.login()" class="w-full bg-pink-600 text-white py-3 rounded-xl font-medium text-sm hover:bg-pink-700 transition">Đăng Nhập</button>
       <div id="auth-error" class="text-red-500 text-xs text-center font-medium"></div>
     </div>
