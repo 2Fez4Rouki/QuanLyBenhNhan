@@ -73,6 +73,10 @@ export const AuthManager = {
         localStorage.removeItem('meditask_saved_email');
         localStorage.removeItem('meditask_saved_password');
       }
+
+      // 🚀 Tải lại trang ngay sau khi đăng nhập thành công để thiết lập lại kết nối Realtime chuẩn xác
+      location.reload();
+      
     } catch (err) {
       console.error(err);
       errorEl.textContent = 'Sai email hoặc mật khẩu!';
