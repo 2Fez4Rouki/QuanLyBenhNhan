@@ -1,6 +1,9 @@
 import { Storage } from './storage.js';
 
 const TodoManager = {
+  editingTodoId: null,
+  editingSubId: null,
+
   init() {
     this.render();
   },
@@ -45,17 +48,28 @@ const TodoManager = {
       const totalSubs = todo.subtasks ? todo.subtasks.length : 0;
       const percent = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (todo.completed ? 100 : 0);
 
-      // Áp dụng link cho tiêu đề công việc chính
+      const isEditingTodo = todo.id === this.editingTodoId;
       const displayedTitle = formatTitleWithLinks(todo.title || '');
 
       return `
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3">
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3 flex-1 mr-2">
               <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="TodoManager.toggleTodo('${todo.id}')" class="w-5 h-5 text-blue-600 rounded">
-              <span class="font-bold text-gray-800 ${todo.completed ? 'line-through text-gray-400' : ''}">${displayedTitle}</span>
+              ${isEditingTodo ? `
+                <div class="flex flex-1 space-x-2 items-center">
+                  <input type="text" id="edit-todo-input-${todo.id}" value="${todo.title || ''}" class="text-sm border p-1 rounded flex-1 focus:outline-none focus:border-blue-500 bg-white" onkeypress="if(event.key==='Enter') TodoManager.saveTodoEdit('${todo.id}')">
+                  <button onclick="TodoManager.saveTodoEdit('${todo.id}')" class="bg-blue-600 text-white text-xs px-2.5 py-1 rounded font-medium">Lưu</button>
+                  <button onclick="TodoManager.cancelTodoEdit()" class="bg-gray-300 text-gray-700 text-xs px-2.5 py-1 rounded font-medium">Hủy</button>
+                </div>
+              ` : `
+                <span class="font-bold text-gray-800 ${todo.completed ? 'line-through text-gray-400' : ''}">${displayedTitle}</span>
+              `}
             </div>
             <div class="flex items-center space-x-2">
+              ${!isEditingTodo ? `
+                <button onclick="TodoManager.startTodoEdit('${todo.id}')" class="text-blue-600 hover:text-blue-800 text-xs font-semibold">Sửa</button>
+              ` : ''}
               <div class="flex flex-col">
                 <button onclick="TodoManager.moveUp('${todo.id}')" ${index === 0 ? 'disabled' : ''} class="text-gray-400 hover:text-gray-700 leading-none text-xs disabled:opacity-20">▲</button>
                 <button onclick="TodoManager.moveDown('${todo.id}')" ${index === todos.length - 1 ? 'disabled' : ''} class="text-gray-400 hover:text-gray-700 leading-none text-xs disabled:opacity-20">▼</button>
@@ -67,21 +81,36 @@ const TodoManager = {
           <!-- Sub-tasks -->
           <div class="ml-8 mt-2 space-y-1">
             ${(todo.subtasks || []).map(sub => {
+              const isEditingSub = sub.id === this.editingSubId;
+
+              if (isEditingSub) {
+                return `
+                  <div class="flex items-center space-x-2 text-sm my-1">
+                    <input type="text" id="edit-sub-input-${sub.id}" value="${sub.title || ''}" class="text-xs border p-1 rounded flex-1 focus:outline-none focus:border-blue-500 bg-white" onkeypress="if(event.key==='Enter') TodoManager.saveSubEdit('${todo.id}', '${sub.id}')">
+                    <button onclick="TodoManager.saveSubEdit('${todo.id}', '${sub.id}')" class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded font-medium">Lưu</button>
+                    <button onclick="TodoManager.cancelSubEdit()" class="bg-gray-300 text-gray-700 text-xs px-2 py-0.5 rounded font-medium">Hủy</button>
+                  </div>
+                `;
+              }
+
               // Áp dụng link cho từng sub-task
               const displayedSubTitle = formatTitleWithLinks(sub.title || '');
               return `
                 <div class="flex items-center justify-between text-sm">
-                  <div class="flex items-center space-x-2">
+                  <div class="flex items-center space-x-2 flex-1 mr-2">
                     <input type="checkbox" ${sub.completed ? 'checked' : ''} onchange="TodoManager.toggleSub('${todo.id}', '${sub.id}')" class="w-4 h-4 text-blue-500 rounded">
                     <span class="${sub.completed ? 'line-through text-gray-400' : 'text-gray-600'}">${displayedSubTitle}</span>
                   </div>
-                  <button onclick="TodoManager.deleteSub('${todo.id}', '${sub.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
+                  <div class="flex items-center space-x-1">
+                    <button onclick="TodoManager.startSubEdit('${sub.id}')" class="text-blue-500 hover:text-blue-700 text-xs font-semibold mr-1">Sửa</button>
+                    <button onclick="TodoManager.deleteSub('${todo.id}', '${sub.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
+                  </div>
                 </div>
               `;
             }).join('')}
             
             <div class="flex mt-2 space-x-2">
-              <input type="text" id="sub-input-${todo.id}" placeholder="Thêm sub-task..." class="text-xs border rounded px-2 py-1 flex-1 focus:outline-none focus:border-blue-500">
+              <input type="text" id="sub-input-${todo.id}" placeholder="Thêm sub-task..." class="text-xs border rounded px-2 py-1 flex-1 focus:outline-none focus:border-blue-500" onkeypress="if(event.key==='Enter') TodoManager.addSub('${todo.id}')">
               <button onclick="TodoManager.addSub('${todo.id}')" class="bg-gray-100 hover:bg-gray-200 text-xs px-2 py-1 rounded font-medium">Thêm</button>
             </div>
           </div>
@@ -126,6 +155,60 @@ const TodoManager = {
     let todos = Storage.getTodos();
     todos = todos.filter(t => t.id !== id);
     Storage.saveTodos(todos);
+    this.render();
+  },
+
+  startTodoEdit(id) {
+    this.editingTodoId = id;
+    this.editingSubId = null;
+    this.render();
+  },
+
+  cancelTodoEdit() {
+    this.editingTodoId = null;
+    this.render();
+  },
+
+  saveTodoEdit(id) {
+    const input = document.getElementById(`edit-todo-input-${id}`);
+    if (!input || !input.value.trim()) {
+      alert('Tiêu đề công việc không được để trống!');
+      return;
+    }
+    let todos = Storage.getTodos();
+    todos = todos.map(t => t.id === id ? { ...t, title: input.value.trim() } : t);
+    Storage.saveTodos(todos);
+    this.editingTodoId = null;
+    this.render();
+  },
+
+  startSubEdit(subId) {
+    this.editingSubId = subId;
+    this.editingTodoId = null;
+    this.render();
+  },
+
+  cancelSubEdit() {
+    this.editingSubId = null;
+    this.render();
+  },
+
+  saveSubEdit(todoId, subId) {
+    const input = document.getElementById(`edit-sub-input-${subId}`);
+    if (!input || !input.value.trim()) {
+      alert('Nội dung công việc phụ không được để trống!');
+      return;
+    }
+    let todos = Storage.getTodos();
+    todos = todos.map(t => {
+      if (t.id === todoId) {
+        const updatedSubs = (t.subtasks || []).map(s => s.id === subId ? { ...s, title: input.value.trim().replace(/['"]/g, '') } : s);
+        return { ...t, subtasks: updatedSubs };
+      }
+      return t;
+    });
+    Storage.saveTodos(todos);
+    this.editingSubId = null;
     this.render();
   },
 
