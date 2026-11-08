@@ -37,10 +37,16 @@
         <!-- Khung chứa danh sách tái khám hôm nay -->
         <div id="today-patient-container" class="hidden mb-4"></div>
 
-        <!-- Search Bar -->
-        <div class="mb-3 relative">
+        <!-- Ô Tìm kiếm 1: Tên, SĐT, Ngày tái khám -->
+        <div class="mb-2 relative">
           <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border-2 border-gray-600 p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
           <button id="p-search-clear" onclick="PatientManager.clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+        </div>
+
+        <!-- Ô Tìm kiếm 2: Chuyên tìm theo Ghi chú chung -->
+        <div class="mb-3 relative">
+          <input type="text" id="p-note-search" oninput="PatientManager.handleNoteSearch(event)" placeholder="📝 Tìm kiếm theo ghi chú chung..." class="w-full text-sm border-2 border-gray-600 p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
+          <button id="p-note-search-clear" onclick="PatientManager.clearNoteSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
 
         <!-- Add Patient Form -->
@@ -63,7 +69,6 @@
 
       <!-- Tab 2: Todos -->
       <div id="tab-todos" class="tab-content hidden">
-        
         <form onsubmit="TodoManager.addTodo(event)" class="flex space-x-2 mb-4">
           <input type="text" id="todo-title" placeholder="Thêm công việc chính mới..." required class="flex-1 text-sm border p-2 rounded-xl focus:outline-none focus:border-blue-500">
           <button type="submit" class="bg-pink-200 text-rose-900 px-4 rounded-xl font-medium text-sm">Thêm</button>

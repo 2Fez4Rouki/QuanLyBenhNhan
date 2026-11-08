@@ -24,6 +24,7 @@ function formatDateVN(dateString) {
 
 const PatientManager = {
   searchKeyword: '',
+  noteSearchKeyword: '', // 📝 Biến lưu từ khóa tìm kiếm theo ghi chú chung
   editingId: null,
   showTodayOnly: false,
   showAllPatients: false, // Trạng thái hiển thị toàn bộ danh sách
@@ -87,7 +88,7 @@ const PatientManager = {
       }
     }
 
-    // 2. Cập nhật giao diện nút DS Bệnh Nhân (Đổi sang tông hồng cho đồng bộ)
+    // 2. Cập nhật giao diện nút DS Bệnh Nhân
     if (allToggleBtn) {
       if (this.showAllPatients) {
         allToggleBtn.classList.remove('bg-pink-200', 'text-rose-900');
@@ -98,20 +99,32 @@ const PatientManager = {
       }
     }
 
-    // 3. Render danh sách chính dựa trên từ khóa tìm kiếm hoặc trạng thái bật xem tất cả
+    // 3. Render danh sách chính dựa trên kết hợp từ khóa 2 ô tìm kiếm
     const keyword = this.searchKeyword.toLowerCase().trim();
+    const noteKeyword = this.noteSearchKeyword.toLowerCase().trim();
     
     let targetList = [];
-    if (keyword) {
+    if (keyword || noteKeyword) {
       targetList = patients.filter(p => {
         const nextDateVN = p.nextDate ? formatDateVN(p.nextDate) : '';
-        return (
-          (p.name && p.name.toLowerCase().includes(keyword)) ||
-          (p.phone && p.phone.toLowerCase().includes(keyword)) ||
-          (p.nextDate && p.nextDate.includes(keyword)) ||
-          (nextDateVN && nextDateVN.includes(keyword)) ||
-          (p.dob && p.dob.includes(keyword))
-        );
+        
+        let matchesGeneral = true;
+        if (keyword) {
+          matchesGeneral = (
+            (p.name && p.name.toLowerCase().includes(keyword)) ||
+            (p.phone && p.phone.toLowerCase().includes(keyword)) ||
+            (p.nextDate && p.nextDate.includes(keyword)) ||
+            (nextDateVN && nextDateVN.includes(keyword)) ||
+            (p.dob && p.dob.includes(keyword))
+          );
+        }
+
+        let matchesNote = true;
+        if (noteKeyword) {
+          matchesNote = (p.note && p.note.toLowerCase().includes(noteKeyword));
+        }
+
+        return matchesGeneral && matchesNote;
       });
     } else if (this.showAllPatients) {
       targetList = patients;
@@ -164,7 +177,6 @@ const PatientManager = {
             <div>
               <h3 class="font-bold text-lg text-blue-900">${p.name}</h3>
               <p class="text-sm text-gray-600">📞 ${p.phone} | 📅 Năm sinh: ${p.dob}</p>
-              <!-- 📅 Áp dụng formatDateVN cho ngày tái khám -->
               <p class="text-sm text-amber-600 font-medium mt-1">🔄 Tái khám: ${p.nextDate ? formatDateVN(p.nextDate) : 'Chưa có lịch'}</p>
             </div>
             <div class="flex space-x-2 items-center">
@@ -212,6 +224,8 @@ const PatientManager = {
     this.searchKeyword = keyword;
     const searchInput = document.getElementById('p-search');
     if (searchInput) searchInput.value = keyword;
+    const clearBtn = document.getElementById('p-search-clear');
+    if (clearBtn) clearBtn.classList.remove('hidden');
     this.showTodayOnly = false;
     this.showAllPatients = false;
     this.render();
@@ -229,6 +243,22 @@ const PatientManager = {
     const searchInput = document.getElementById('p-search');
     if (searchInput) searchInput.value = '';
     const clearBtn = document.getElementById('p-search-clear');
+    if (clearBtn) clearBtn.classList.add('hidden');
+    this.render();
+  },
+
+  handleNoteSearch(e) {
+    this.noteSearchKeyword = e.target.value;
+    const clearBtn = document.getElementById('p-note-search-clear');
+    if (clearBtn) clearBtn.classList.toggle('hidden', !this.noteSearchKeyword);
+    this.render();
+  },
+
+  clearNoteSearch() {
+    this.noteSearchKeyword = '';
+    const searchInput = document.getElementById('p-note-search');
+    if (searchInput) searchInput.value = '';
+    const clearBtn = document.getElementById('p-note-search-clear');
     if (clearBtn) clearBtn.classList.add('hidden');
     this.render();
   },
@@ -347,7 +377,6 @@ const PatientManager = {
     if (alertBox) {
       if (todayList.length > 0) {
         alertBox.classList.remove('hidden');
-        // 📅 Áp dụng formatDateVN cho cảnh báo tái khám hôm nay
         alertBox.innerHTML = `⚠️ Có <strong>${todayList.length} bệnh nhân</strong> cần tái khám hôm nay (${formatDateVN(today)}): ${todayList.map(p => p.name).join(', ')}`;
       } else {
         alertBox.classList.add('hidden');
