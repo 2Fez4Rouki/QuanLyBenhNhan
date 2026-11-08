@@ -10,7 +10,19 @@
 </head>
 <body class="bg-gray-50 min-h-screen text-gray-800">
 
-  <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg flex flex-col">
+  <!-- 🔒 Màn hình đăng nhập (Hiển thị mặc định khi chưa đăng nhập) -->
+  <div id="auth-screen" class="max-w-md mx-auto bg-white min-h-screen shadow-lg flex flex-col justify-center items-center p-6">
+    <div class="w-full max-w-sm bg-pink-50 p-6 rounded-2xl border border-pink-200 shadow-sm space-y-4">
+      <h2 class="text-center font-bold text-rose-900 text-lg">🔒 Đăng Nhập Hệ Thống</h2>
+      <input type="email" id="auth-email" placeholder="Email của bạn" class="w-full text-sm border p-3 rounded-xl bg-white focus:outline-none focus:border-pink-500">
+      <input type="password" id="auth-password" placeholder="Mật khẩu" class="w-full text-sm border p-3 rounded-xl bg-white focus:outline-none focus:border-pink-500">
+      <button onclick="AuthManager.login()" class="w-full bg-pink-600 text-white py-3 rounded-xl font-medium text-sm hover:bg-pink-700 transition">Đăng Nhập</button>
+      <div id="auth-error" class="text-red-500 text-xs text-center font-medium"></div>
+    </div>
+  </div>
+
+  <!-- 📱 Nội dung chính của app (Ban đầu ẩn đi, chỉ hiện khi đã đăng nhập thành công) -->
+  <div id="main-app-container" class="max-w-md mx-auto bg-white min-h-screen shadow-lg flex flex-col hidden">
     <!-- Header -->
     <header class="bg-pink-200 text-rose-900 p-4 text-center font-bold text-lg shadow">
       (˵ ͡° ͜ʖ ͡°˵) 📖
@@ -34,22 +46,18 @@
           </div>
         </div>
 
-        <!-- Khung chứa danh sách tái khám hôm nay -->
         <div id="today-patient-container" class="hidden mb-4"></div>
 
-        <!-- Ô Tìm kiếm 1: Tên, SĐT, Ngày tái khám -->
         <div class="mb-2 relative">
           <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border-2 border-gray-600 p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
           <button id="p-search-clear" onclick="PatientManager.clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
 
-        <!-- Ô Tìm kiếm 2: Chuyên tìm theo Ghi chú chung -->
         <div class="mb-3 relative">
           <input type="text" id="p-note-search" oninput="PatientManager.handleNoteSearch(event)" placeholder="📝 Tìm kiếm theo ghi chú chung..." class="w-full text-sm border-2 border-gray-600 p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
           <button id="p-note-search-clear" onclick="PatientManager.clearNoteSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
 
-        <!-- Add Patient Form -->
         <form onsubmit="PatientManager.addPatient(event)" class="bg-green-100 p-3 rounded-xl border-2 border-green-600 mb-4 space-y-2">
           <input type="text" id="p-name" placeholder="Họ tên bệnh nhân" required class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
           <div class="flex space-x-2">
@@ -90,6 +98,7 @@
   </div>
 
   <script type="module" src="js/storage.js"></script>
+  <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/patients.js"></script>
   <script type="module" src="js/todos.js"></script>
   <script type="module" src="js/app.js"></script>
