@@ -40,7 +40,7 @@ export const AuthManager = {
         if (authScreen) authScreen.classList.add('hidden');
         if (mainApp) mainApp.classList.remove('hidden');
         
-        // Khởi động dữ liệu
+        // Khởi động dữ liệu và kích hoạt lắng nghe realtime
         if (window.PatientManager && typeof window.PatientManager.init === 'function') {
           window.PatientManager.init();
         }
@@ -73,10 +73,8 @@ export const AuthManager = {
         localStorage.removeItem('meditask_saved_email');
         localStorage.removeItem('meditask_saved_password');
       }
-
-      // 🚀 Tải lại trang ngay sau khi đăng nhập thành công để thiết lập lại kết nối Realtime chuẩn xác
-      location.reload();
       
+      // Không cần reload trang nữa, onAuthStateChanged ở trên sẽ tự động xử lý chuyển màn hình mượt mà!
     } catch (err) {
       console.error(err);
       errorEl.textContent = 'Sai email hoặc mật khẩu!';
