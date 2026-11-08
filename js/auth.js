@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { Storage } from './storage.js'; // Import Storage để gọi hàm kích hoạt lắng nghe
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIrXhvz31PzAtJrK2WnZJMirbU09ahMWo",
@@ -13,14 +14,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// Ép Firebase không lưu phiên vĩnh viễn (mỗi lần mở lại app là bắt buộc đăng nhập lại)
 setPersistence(auth, inMemoryPersistence).catch((error) => {
   console.error("Lỗi cấu hình persistence:", error);
 });
 
 export const AuthManager = {
   init() {
-    // Tự động điền thông tin nếu trước đó đã lưu
     const savedEmail = localStorage.getItem('meditask_saved_email');
     const savedPass = localStorage.getItem('meditask_saved_password');
     
@@ -36,11 +35,14 @@ export const AuthManager = {
       const mainApp = document.getElementById('main-app-container');
 
       if (user) {
-        // Đã đăng nhập -> Ẩn màn hình khóa, hiện app chính
+        // Đã đăng nhập thành công -> Hiện giao diện chính
         if (authScreen) authScreen.classList.add('hidden');
         if (mainApp) mainApp.classList.remove('hidden');
         
-        // Khởi động dữ liệu và kích hoạt lắng nghe realtime
+        // 🚀 KÍCH HOẠT LẮNG NGHE REALTIME AN TOÀN TẠI ĐÂY (Đã có quyền Auth)
+        Storage.initListener();
+
+        // Khởi động các Manager giao diện
         if (window.PatientManager && typeof window.PatientManager.init === 'function') {
           window.PatientManager.init();
         }
@@ -48,7 +50,7 @@ export const AuthManager = {
           window.TodoManager.init();
         }
       } else {
-        // Chưa đăng nhập -> Hiện màn hình khóa, ẩn app chính
+        // Chưa đăng nhập -> Hiện màn hình khóa
         if (authScreen) authScreen.classList.remove('hidden');
         if (mainApp) mainApp.classList.add('hidden');
       }
@@ -65,7 +67,6 @@ export const AuthManager = {
       errorEl.textContent = '';
       await signInWithEmailAndPassword(auth, email, password);
 
-      // Xử lý lưu hoặc xóa mật khẩu dựa vào ô checkbox
       if (rememberCheckbox && rememberCheckbox.checked) {
         localStorage.setItem('meditask_saved_email', email);
         localStorage.setItem('meditask_saved_password', password);
@@ -73,8 +74,6 @@ export const AuthManager = {
         localStorage.removeItem('meditask_saved_email');
         localStorage.removeItem('meditask_saved_password');
       }
-      
-      // Không cần reload trang nữa, onAuthStateChanged ở trên sẽ tự động xử lý chuyển màn hình mượt mà!
     } catch (err) {
       console.error(err);
       errorEl.textContent = 'Sai email hoặc mật khẩu!';
