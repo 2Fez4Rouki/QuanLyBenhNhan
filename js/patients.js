@@ -12,7 +12,7 @@ function getLocalDateString() {
 // 📅 Hàm chuyển đổi định dạng từ YYYY-MM-DD sang DD/MM/YYYY để hiển thị đẹp mắt
 function formatDateVN(dateString) {
   if (!dateString) return '';
-  if (dateString.length === 4) return dateString; // Trường hợp chỉ lưu năm (năm sinh)
+  if (dateString.length === 4) return dateString;
   
   const parts = dateString.split('-');
   if (parts.length === 3) {
@@ -24,10 +24,10 @@ function formatDateVN(dateString) {
 
 const PatientManager = {
   searchKeyword: '',
-  noteSearchKeyword: '', // 📝 Biến lưu từ khóa tìm kiếm theo ghi chú chung
+  noteSearchKeyword: '',
   editingId: null,
   showTodayOnly: false,
-  showAllPatients: false, // Trạng thái hiển thị toàn bộ danh sách
+  showAllPatients: false,
 
   init() {
     this.render();
@@ -48,7 +48,6 @@ const PatientManager = {
     const countEl = document.getElementById('patient-count');
     if (countEl) countEl.textContent = patients.length;
 
-    // 1. Render khu vực tái khám hôm nay
     if (todayContainer) {
       if (this.showTodayOnly) {
         if (todayToggleBtn) {
@@ -88,7 +87,6 @@ const PatientManager = {
       }
     }
 
-    // 2. Cập nhật giao diện nút DS Bệnh Nhân
     if (allToggleBtn) {
       if (this.showAllPatients) {
         allToggleBtn.classList.remove('bg-pink-200', 'text-rose-900');
@@ -99,7 +97,6 @@ const PatientManager = {
       }
     }
 
-    // 3. Render danh sách chính dựa trên kết hợp từ khóa 2 ô tìm kiếm
     const keyword = this.searchKeyword.toLowerCase().trim();
     const noteKeyword = this.noteSearchKeyword.toLowerCase().trim();
     
@@ -161,7 +158,6 @@ const PatientManager = {
         `;
       }
 
-      // 📅 Áp dụng formatDateVN cho ngày trong lịch sử khám
       const historyList = (p.history || []).map(h => `
         <div class="flex justify-between items-center text-xs bg-white p-2 rounded border border-gray-100 mb-1">
           <div>

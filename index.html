@@ -91,15 +91,46 @@
 
         <div id="todo-list"></div>
       </div>
+
+      <!-- Tab 3: Calendar -->
+      <div id="tab-calendar" class="tab-content hidden">
+        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm mb-4">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-1">
+              <button onclick="CalendarManager.prevMonth()" class="px-2.5 py-1 rounded-lg bg-pink-100 text-rose-900 font-bold text-sm hover:bg-pink-200 transition">‹</button>
+              <button onclick="CalendarManager.goToday()" class="px-2.5 py-1 rounded-lg bg-gray-100 text-gray-700 font-medium text-xs hover:bg-gray-200 transition">Hôm nay</button>
+              <button onclick="CalendarManager.nextMonth()" class="px-2.5 py-1 rounded-lg bg-pink-100 text-rose-900 font-bold text-sm hover:bg-pink-200 transition">›</button>
+            </div>
+            <h2 id="cal-month-title" class="font-bold text-sm text-rose-900"></h2>
+          </div>
+
+          <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-gray-500 mb-1">
+            <div>T2</div>
+            <div>T3</div>
+            <div>T4</div>
+            <div>T5</div>
+            <div>T6</div>
+            <div class="text-rose-600">T7</div>
+            <div class="text-rose-600">CN</div>
+          </div>
+
+          <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center"></div>
+        </div>
+
+        <div id="cal-selected-container"></div>
+      </div>
     </main>
 
     <!-- Bottom Navigation Bar -->
     <nav class="bg-white border-t flex fixed bottom-0 max-w-md w-full shadow-inner">
-      <button onclick="switchTab('tab-patients')" id="btn-tab-patients" class="tab-btn flex-1 py-3 text-center text-sm font-semibold bg-pink-200 text-rose-900 transition">
+      <button onclick="switchTab('tab-patients')" id="btn-tab-patients" class="tab-btn flex-1 py-3 text-center text-xs font-semibold bg-pink-200 text-rose-900 transition">
         👥 Bệnh Nhân
       </button>
-      <button onclick="switchTab('tab-todos')" id="btn-tab-todos" class="tab-btn flex-1 py-3 text-center text-sm font-semibold bg-pink-200 text-rose-900 transition">
+      <button onclick="switchTab('tab-todos')" id="btn-tab-todos" class="tab-btn flex-1 py-3 text-center text-xs font-semibold bg-pink-200 text-rose-900 transition">
         📋 Công Việc
+      </button>
+      <button onclick="switchTab('tab-calendar')" id="btn-tab-calendar" class="tab-btn flex-1 py-3 text-center text-xs font-semibold bg-pink-200 text-rose-900 transition">
+        📅 Lịch
       </button>
     </nav>
   </div>
@@ -108,6 +139,7 @@
   <script type="module" src="js/auth.js"></script>
   <script type="module" src="js/patients.js"></script>
   <script type="module" src="js/todos.js"></script>
+  <script type="module" src="js/calendar.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

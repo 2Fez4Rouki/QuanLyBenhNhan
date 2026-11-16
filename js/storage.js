@@ -55,6 +55,9 @@ export const Storage = {
 
   savePatients(patients) {
     localStorage.setItem('patients_db', JSON.stringify(patients));
+    if (typeof window.CalendarManager !== 'undefined' && typeof window.CalendarManager.init === 'function') {
+      window.CalendarManager.init();
+    }
     this.syncToCloud();
   },
 
@@ -70,7 +73,7 @@ export const Storage = {
 
   // 📡 Hàm kích hoạt lắng nghe Realtime (chỉ gọi sau khi đã đăng nhập thành công)
   initListener() {
-    if (unsubscribeListener) return; // Tránh đăng ký trùng lặp nhiều lần
+    if (unsubscribeListener) return;
 
     unsubscribeListener = onSnapshot(CLOUD_DOC_REF, (docSnap) => {
       if (docSnap.exists()) {
@@ -110,6 +113,9 @@ export const Storage = {
           }
           if (typeof window.TodoManager !== 'undefined' && typeof window.TodoManager.init === 'function') {
             window.TodoManager.init();
+          }
+          if (typeof window.CalendarManager !== 'undefined' && typeof window.CalendarManager.init === 'function') {
+            window.CalendarManager.init();
           }
         }
       }

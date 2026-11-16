@@ -1,11 +1,13 @@
-const CACHE_NAME = 'meditask-v38'; // 💡 Nhớ tăng version này lên mỗi khi bạn deploy code mới (v3, v4, v5...)
+const CACHE_NAME = 'meditask-v39'; // 💡 Nhớ tăng version này lên mỗi khi bạn deploy code mới (v3, v4, v5...)
 const assets = [
   './',
   './index.html',
   './css/style.css',
   './js/storage.js',
+  './js/auth.js',
   './js/patients.js',
   './js/todos.js',
+  './js/calendar.js',
   './js/app.js',
   './manifest.json'
 ];
@@ -17,7 +19,6 @@ self.addEventListener('install', e => {
       return cache.addAll(assets);
     })
   );
-  // Ép Service Worker mới kích hoạt ngay lập tức mà không cần chờ đợi các tab cũ đóng lại
   self.skipWaiting();
 });
 
@@ -35,23 +36,19 @@ self.addEventListener('activate', e => {
       );
     })
   );
-  // Chiếm quyền kiểm soát ngay lập tức tất cả các client/tab đang mở
   self.clients.claim();
 });
 
 // 3. Chiến lược Fetch: Luôn ưu tiên lấy bản mới nhất từ mạng, nếu mất mạng mới dùng cache
 self.addEventListener('fetch', e => {
-  // Bỏ qua các request không phải GET hoặc request tới Firebase/API bên ngoài nếu có
   if (e.request.method !== 'GET') return;
 
   e.respondWith(
     fetch(e.request)
       .then(networkResponse => {
-        // Nếu gọi mạng thành công, trả về dữ liệu mới tinh từ server
         return networkResponse;
       })
       .catch(() => {
-        // Nếu thiết bị mất kết nối internet (offline), mới tìm trong cache trả về
         return caches.match(e.request);
       })
   );

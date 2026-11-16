@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, setPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { Storage } from './storage.js'; // Import Storage để gọi hàm kích hoạt lắng nghe
+import { Storage } from './storage.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDIrXhvz31PzAtJrK2WnZJMirbU09ahMWo",
@@ -35,22 +35,21 @@ export const AuthManager = {
       const mainApp = document.getElementById('main-app-container');
 
       if (user) {
-        // Đã đăng nhập thành công -> Hiện giao diện chính
         if (authScreen) authScreen.classList.add('hidden');
         if (mainApp) mainApp.classList.remove('hidden');
         
-        // 🚀 KÍCH HOẠT LẮNG NGHE REALTIME AN TOÀN TẠI ĐÂY (Đã có quyền Auth)
         Storage.initListener();
 
-        // Khởi động các Manager giao diện
         if (window.PatientManager && typeof window.PatientManager.init === 'function') {
           window.PatientManager.init();
         }
         if (window.TodoManager && typeof window.TodoManager.init === 'function') {
           window.TodoManager.init();
         }
+        if (window.CalendarManager && typeof window.CalendarManager.init === 'function') {
+          window.CalendarManager.init();
+        }
       } else {
-        // Chưa đăng nhập -> Hiện màn hình khóa
         if (authScreen) authScreen.classList.remove('hidden');
         if (mainApp) mainApp.classList.add('hidden');
       }

@@ -10,8 +10,8 @@ const TodoManager = {
 
   render() {
     const rawTodos = Storage.getTodos();
-    const todos = Array.isArray(rawTodos) ? rawTodos : []; // 🛡️ Ép an toàn tránh lỗi trắng trang
-    const patients = Storage.getPatients(); // Lấy danh sách bệnh nhân để đối chiếu
+    const todos = Array.isArray(rawTodos) ? rawTodos : [];
+    const patients = Storage.getPatients();
     const container = document.getElementById('todo-list');
     if (!container) return;
 
@@ -20,7 +20,6 @@ const TodoManager = {
       return;
     }
 
-    // 🔍 Tạo sẵn biểu thức Regex nhận diện tên bệnh nhân (sắp xếp từ dài đến ngắn để match chính xác)
     let regex = null;
     if (patients.length > 0) {
       const validNames = patients
@@ -34,7 +33,6 @@ const TodoManager = {
       }
     }
 
-    // 🔗 Hàm hỗ trợ biến tên bệnh nhân trong chuỗi thành thẻ span có thể bấm để chuyển tab
     const formatTitleWithLinks = (text) => {
       if (!text) return '';
       if (!regex) return text;
@@ -78,7 +76,6 @@ const TodoManager = {
             </div>
           </div>
           
-          <!-- Sub-tasks -->
           <div class="ml-8 mt-2 space-y-1">
             ${(todo.subtasks || []).map(sub => {
               const isEditingSub = sub.id === this.editingSubId;
@@ -93,7 +90,6 @@ const TodoManager = {
                 `;
               }
 
-              // Áp dụng link cho từng sub-task
               const displayedSubTitle = formatTitleWithLinks(sub.title || '');
               return `
                 <div class="flex items-center justify-between text-sm">
@@ -115,7 +111,6 @@ const TodoManager = {
             </div>
           </div>
 
-          <!-- Progress bar -->
           <div class="mt-3 w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
             <div class="bg-blue-600 h-1.5 transition-all duration-300" style="width: ${percent}%"></div>
           </div>
