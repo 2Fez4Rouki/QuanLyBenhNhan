@@ -56,7 +56,7 @@
         <div id="today-patient-container" class="hidden mb-4"></div>
 
         <div class="mb-2 relative">
-          <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám...)" class="w-full text-sm border-2 border-gray-600 p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
+          <input type="text" id="p-search" oninput="PatientManager.handleSearch(event)" placeholder="🔍 Tìm kiếm (Tên, SĐT, ngày tái khám, trạng thái...)" class="w-full text-sm border-2 border-gray-600 p-2 pr-8 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500">
           <button id="p-search-clear" onclick="PatientManager.clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
         </div>
 
@@ -66,16 +66,26 @@
         </div>
 
         <form onsubmit="PatientManager.addPatient(event)" class="bg-green-100 p-3 rounded-xl border-2 border-green-600 mb-4 space-y-2">
-          <input type="text" id="p-name" placeholder="Họ tên bệnh nhân" required class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
+          <input type="text" id="p-name" placeholder="Họ tên bệnh nhân" required class="w-full text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
           <div class="flex space-x-2">
-            <input type="number" id="p-dob" placeholder="Năm sinh (vd: 1990)" min="1900" max="2100" required class="w-1/2 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
-            <input type="tel" id="p-phone" placeholder="Số điện thoại" required class="w-1/2 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
+            <input type="number" id="p-dob" placeholder="Năm sinh (vd: 1990)" min="1900" max="2100" required class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+            <input type="tel" id="p-phone" placeholder="Số điện thoại" required class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
           </div>
           <div class="flex items-center space-x-2">
-            <label class="text-xs text-gray-500 font-medium">Ngày tái khám:</label>
-            <input type="date" id="p-next-date" class="flex-1 text-sm border p-2 rounded focus:outline-none focus:border-blue-500">
+            <label class="text-xs text-gray-600 font-medium whitespace-nowrap">Trạng thái:</label>
+            <select id="p-status" class="flex-1 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+              <option value="Không rõ" selected>Không rõ</option>
+              <option value="Đang điều trị">Đang điều trị</option>
+              <option value="Kết thúc điều trị">Kết thúc điều trị</option>
+              <option value="Đã mất">Đã mất</option>
+              <option value="Bỏ điều trị">Bỏ điều trị</option>
+            </select>
           </div>
-          <textarea id="p-note" placeholder="Ghi chú tổng quan bệnh lý..." class="w-full text-sm border p-2 rounded focus:outline-none focus:border-blue-500"></textarea>
+          <div class="flex items-center space-x-2">
+            <label class="text-xs text-gray-600 font-medium whitespace-nowrap">Ngày tái khám:</label>
+            <input type="date" id="p-next-date" class="flex-1 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+          </div>
+          <textarea id="p-note" placeholder="Ghi chú tổng quan bệnh lý..." class="w-full text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500"></textarea>
           <button type="submit" class="w-full bg-pink-200 text-rose-900 py-2 rounded font-medium text-sm hover:bg-pink-400">Thêm Bệnh Nhân</button>
         </form>
 

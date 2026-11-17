@@ -1,5 +1,26 @@
 import { Storage } from './storage.js';
 
+const TREATMENT_STATUSES = [
+  'Không rõ',
+  'Đang điều trị',
+  'Kết thúc điều trị',
+  'Đã mất',
+  'Bỏ điều trị'
+];
+
+function getStatusBadge(status) {
+  const normalized = status || 'Không rõ';
+  const styleMap = {
+    'Đang điều trị': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    'Kết thúc điều trị': 'bg-blue-100 text-blue-800 border-blue-300',
+    'Đã mất': 'bg-gray-700 text-white border-gray-800',
+    'Bỏ điều trị': 'bg-red-100 text-red-800 border-red-300',
+    'Không rõ': 'bg-gray-100 text-gray-600 border-gray-300'
+  };
+  const cls = styleMap[normalized] || styleMap['Không rõ'];
+  return `<span class="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full border ${cls}">${normalized}</span>`;
+}
+
 // 🛠 Hàm phụ trợ lấy ngày chính xác theo giờ Local (tránh lệch UTC)
 function getLocalDateString() {
   const now = new Date();
@@ -67,8 +88,9 @@ const PatientManager = {
               <div class="space-y-2">
                 ${todayList.map(p => `
                   <div class="bg-white p-2.5 rounded-lg border border-amber-100 flex justify-between items-center text-xs">
-                    <div>
-                      <span class="font-bold text-blue-900">${p.name}</span> - 📞 ${p.phone}
+                    <div class="space-y-0.5">
+                      <div><span class="font-bold text-blue-900">${p.name}</span> - 📞 ${p.phone}</div>
+                      <div>${getStatusBadge(p.status)}</div>
                     </div>
                     <button onclick="PatientManager.searchAndFocus('${p.phone}')" class="bg-pink-600 text-white px-2 py-1 rounded hover:bg-blue-700">Xem/Sửa</button>
                   </div>
@@ -104,6 +126,7 @@ const PatientManager = {
     if (keyword || noteKeyword) {
       targetList = patients.filter(p => {
         const nextDateVN = p.nextDate ? formatDateVN(p.nextDate) : '';
+        const statusText = (p.status || 'Không rõ').toLowerCase();
         
         let matchesGeneral = true;
         if (keyword) {
@@ -112,7 +135,8 @@ const PatientManager = {
             (p.phone && p.phone.toLowerCase().includes(keyword)) ||
             (p.nextDate && p.nextDate.includes(keyword)) ||
             (nextDateVN && nextDateVN.includes(keyword)) ||
-            (p.dob && p.dob.includes(keyword))
+            (p.dob && p.dob.includes(keyword)) ||
+            statusText.includes(keyword)
           );
         }
 
@@ -136,7 +160,13 @@ const PatientManager = {
     }
 
     container.innerHTML = targetList.map(p => {
+      const currentStatus = p.status || 'Không rõ';
+
       if (p.id === this.editingId) {
+        const optionsHtml = TREATMENT_STATUSES.map(st =>
+          `<option value="${st}" ${st === currentStatus ? 'selected' : ''}>${st}</option>`
+        ).join('');
+
         return `
           <div class="bg-blue-50 p-4 rounded-xl shadow-sm border border-blue-200 mb-3 space-y-2">
             <div class="font-bold text-sm text-blue-900 mb-1">Chỉnh sửa thông tin bệnh nhân</div>
@@ -146,7 +176,13 @@ const PatientManager = {
               <input type="tel" id="edit-phone-${p.id}" value="${p.phone || ''}" placeholder="SĐT" class="w-1/2 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
             </div>
             <div class="flex items-center space-x-2">
-              <label class="text-xs text-gray-600 font-medium">Tái khám:</label>
+              <label class="text-xs text-gray-600 font-medium whitespace-nowrap">Trạng thái:</label>
+              <select id="edit-status-${p.id}" class="flex-1 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
+                ${optionsHtml}
+              </select>
+            </div>
+            <div class="flex items-center space-x-2">
+              <label class="text-xs text-gray-600 font-medium whitespace-nowrap">Tái khám:</label>
               <input type="date" id="edit-next-${p.id}" value="${p.nextDate || ''}" class="flex-1 text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">
             </div>
             <textarea id="edit-note-${p.id}" placeholder="Ghi chú chung..." class="w-full text-sm border p-2 rounded bg-white focus:outline-none focus:border-blue-500">${p.note || ''}</textarea>
@@ -169,13 +205,16 @@ const PatientManager = {
 
       return `
         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3 hover:shadow-md transition">
-          <div class="flex justify-between items-start">
+          <div class="flex justify-between items-start gap-2">
             <div>
-              <h3 class="font-bold text-lg text-blue-900">${p.name}</h3>
-              <p class="text-sm text-gray-600">📞 ${p.phone} | 📅 Năm sinh: ${p.dob}</p>
+              <div class="flex items-center flex-wrap gap-2">
+                <h3 class="font-bold text-lg text-blue-900">${p.name}</h3>
+                ${getStatusBadge(currentStatus)}
+              </div>
+              <p class="text-sm text-gray-600 mt-0.5">📞 ${p.phone} | 📅 Năm sinh: ${p.dob}</p>
               <p class="text-sm text-amber-600 font-medium mt-1">🔄 Tái khám: ${p.nextDate ? formatDateVN(p.nextDate) : 'Chưa có lịch'}</p>
             </div>
-            <div class="flex space-x-2 items-center">
+            <div class="flex space-x-2 items-center shrink-0">
               <button onclick="PatientManager.startEdit('${p.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">Sửa</button>
               <button onclick="PatientManager.deletePatient('${p.id}')" class="text-red-500 hover:text-red-700 text-sm font-semibold">Xóa</button>
             </div>
@@ -273,6 +312,7 @@ const PatientManager = {
     const name = document.getElementById(`edit-name-${id}`).value;
     const dob = document.getElementById(`edit-dob-${id}`).value;
     const phone = document.getElementById(`edit-phone-${id}`).value;
+    const status = document.getElementById(`edit-status-${id}`).value || 'Không rõ';
     const nextDate = document.getElementById(`edit-next-${id}`).value;
     const note = document.getElementById(`edit-note-${id}`).value;
 
@@ -284,7 +324,7 @@ const PatientManager = {
     let patients = Storage.getPatients();
     patients = patients.map(p => {
       if (p.id === id) {
-        return { ...p, name, dob, phone, nextDate, note };
+        return { ...p, name, dob, phone, status, nextDate, note };
       }
       return p;
     });
@@ -298,11 +338,13 @@ const PatientManager = {
   addPatient(e) {
     e.preventDefault();
     const patients = Storage.getPatients();
+    const statusEl = document.getElementById('p-status');
     const newPatient = {
       id: Date.now().toString(),
       name: document.getElementById('p-name').value,
       dob: document.getElementById('p-dob').value,
       phone: document.getElementById('p-phone').value,
+      status: statusEl ? statusEl.value : 'Không rõ',
       note: document.getElementById('p-note').value,
       nextDate: document.getElementById('p-next-date').value,
       history: []
@@ -312,6 +354,7 @@ const PatientManager = {
     this.render();
     this.checkReminders();
     e.target.reset();
+    if (statusEl) statusEl.value = 'Không rõ';
   },
 
   deletePatient(id) {
@@ -381,7 +424,10 @@ const PatientManager = {
   },
 
   exportJSON() {
-    const data = Storage.getPatients();
+    const data = Storage.getPatients().map(p => ({
+      ...p,
+      status: p.status || 'Không rõ'
+    }));
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -396,8 +442,11 @@ const PatientManager = {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target.result);
-        Storage.savePatients(data);
+        const rawData = JSON.parse(event.target.result);
+        const normalizedData = Array.isArray(rawData)
+          ? rawData.map(p => ({ ...p, status: p.status || 'Không rõ' }))
+          : [];
+        Storage.savePatients(normalizedData);
         this.render();
         this.checkReminders();
         alert('Nhập dữ liệu JSON thành công!');

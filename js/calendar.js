@@ -17,6 +17,19 @@ function formatDateVN(dateString) {
   return dateString;
 }
 
+function getStatusBadge(status) {
+  const normalized = status || 'Không rõ';
+  const styleMap = {
+    'Đang điều trị': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    'Kết thúc điều trị': 'bg-blue-100 text-blue-800 border-blue-300',
+    'Đã mất': 'bg-gray-700 text-white border-gray-800',
+    'Bỏ điều trị': 'bg-red-100 text-red-800 border-red-300',
+    'Không rõ': 'bg-gray-100 text-gray-600 border-gray-300'
+  };
+  const cls = styleMap[normalized] || styleMap['Không rõ'];
+  return `<span class="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border ${cls}">${normalized}</span>`;
+}
+
 const CalendarManager = {
   currentYear: new Date().getFullYear(),
   currentMonth: new Date().getMonth(),
@@ -154,8 +167,11 @@ const CalendarManager = {
         <div class="space-y-2">
           ${matchedPatients.map(p => `
             <div class="p-2.5 rounded-lg bg-pink-50/60 border border-pink-100 flex justify-between items-start gap-2">
-              <div class="text-xs space-y-0.5">
-                <div class="font-bold text-blue-900 text-sm">${p.name || ''}</div>
+              <div class="text-xs space-y-1">
+                <div class="flex items-center flex-wrap gap-1.5">
+                  <span class="font-bold text-blue-900 text-sm">${p.name || ''}</span>
+                  ${getStatusBadge(p.status)}
+                </div>
                 <div class="text-gray-600">📞 ${p.phone || ''} ${p.dob ? `| Năm sinh: ${p.dob}` : ''}</div>
                 ${p.note ? `<div class="text-gray-700 bg-white/80 px-2 py-1 rounded mt-1 border border-pink-100">📝 ${p.note}</div>` : ''}
               </div>
